@@ -69,7 +69,7 @@ public class DriveEncoderLocalizer extends Localizer {
      * @param setStartPose the Pose to start from
      */
     public DriveEncoderLocalizer(HardwareMap map, Pose setStartPose) {
-        hardwareMap = map;
+       // hardwareMap = map;
 
         FORWARD_TICKS_TO_INCHES = forwardTicksToInches;
         STRAFE_TICKS_TO_INCHES = strafeTicksToInches;
