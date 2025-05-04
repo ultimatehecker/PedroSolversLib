@@ -1,35 +1,21 @@
 package pedroPathing.tuners_tests.automatic;
 
-import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
-import static com.pedropathing.follower.FollowerConstants.leftRearMotorName;
-import static com.pedropathing.follower.FollowerConstants.rightFrontMotorName;
-import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
-import static com.pedropathing.follower.FollowerConstants.leftFrontMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
-
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.pedropathing.util.Constants;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.math.MathFunctions;
+import com.pedropathing.math.Vector;
+import com.qualcomm.robotcore.eventloop.*;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import com.pedropathing.localization.PoseUpdater;
-import com.pedropathing.pathgen.MathFunctions;
-import com.pedropathing.pathgen.Vector;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import pedroPathing.Constants;
 
 /**
  * This is the ForwardVelocityTuner autonomous follower OpMode. This runs the robot forwards at max
@@ -50,19 +36,10 @@ import pedroPathing.constants.LConstants;
 @Autonomous(name = "Forward Velocity Tuner", group = "Automatic Tuners")
 public class ForwardVelocityTuner extends OpMode {
     private ArrayList<Double> velocities = new ArrayList<>();
-
-    private DcMotorEx leftFront;
-    private DcMotorEx leftRear;
-    private DcMotorEx rightFront;
-    private DcMotorEx rightRear;
-    private List<DcMotorEx> motors;
-
-    private PoseUpdater poseUpdater;
-
+    private Follower follower;
+    
     public static double DISTANCE = 48;
     public static double RECORD_NUMBER = 10;
-
-    private Telemetry telemetryA;
 
     private boolean end;
 
@@ -72,40 +49,18 @@ public class ForwardVelocityTuner extends OpMode {
      */
     @Override
     public void init() {
-        poseUpdater = new PoseUpdater(hardwareMap, FConstants.class, LConstants.class);
-
-        leftFront = hardwareMap.get(DcMotorEx.class, leftFrontMotorName);
-        leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
-        rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
-        rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
-        leftFront.setDirection(leftFrontMotorDirection);
-        leftRear.setDirection(leftRearMotorDirection);
-        rightFront.setDirection(rightFrontMotorDirection);
-        rightRear.setDirection(rightRearMotorDirection);
-
-        motors = Arrays.asList(leftFront, leftRear, rightFront, rightRear);
-
-        for (DcMotorEx motor : motors) {
-            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
-            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
-            motor.setMotorType(motorConfigurationType);
-        }
-
-        for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        }
+        follower = Constants.createFollower(hardwareMap);
 
         for (int i = 0; i < RECORD_NUMBER; i++) {
             velocities.add(0.0);
         }
 
-        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches forward.");
-        telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
-        telemetryA.addLine("After running the distance, the robot will cut power from the drivetrain and display the forward velocity.");
-        telemetryA.addLine("Press CROSS or A on game pad 1 to stop.");
-        telemetryA.addData("pose", poseUpdater.getPose());
-        telemetryA.update();
+        telemetry.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches forward.");
+        telemetry.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
+        telemetry.addLine("After running the distance, the robot will cut power from the drivetrain and display the forward velocity.");
+        telemetry.addLine("Press CROSS or A on game pad 1 to stop.");
+        telemetry.addData("pose", follower.getPose());
+        telemetry.update();
 
     }
 
@@ -114,10 +69,7 @@ public class ForwardVelocityTuner extends OpMode {
      */
     @Override
     public void start() {
-        leftFront.setPower(1);
-        leftRear.setPower(1);
-        rightFront.setPower(1);
-        rightRear.setPower(1);
+        follower.startTeleopDrive(false);
         end = false;
     }
 
@@ -129,43 +81,41 @@ public class ForwardVelocityTuner extends OpMode {
      */
     @Override
     public void loop() {
+        follower.setTeleOpDrive(1,1,1,true);
+
         if (gamepad1.cross || gamepad1.a) {
-            for (DcMotorEx motor : motors) {
-                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                motor.setPower(0);
-            }
+            stopRobot();
             requestOpModeStop();
         }
 
-        poseUpdater.update();
+        follower.update();
+
         if (!end) {
-            if (Math.abs(poseUpdater.getPose().getX()) > DISTANCE) {
+            if (Math.abs(follower.getPose().getX()) > DISTANCE) {
                 end = true;
-                for (DcMotorEx motor : motors) {
-                    motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    motor.setPower(0);
-                }
+                stopRobot();
             } else {
-                double currentVelocity = Math.abs(MathFunctions.dotProduct(poseUpdater.getVelocity(), new Vector(1, 0)));
+                double currentVelocity = Math.abs(MathFunctions.dotProduct(follower.getVelocity(), new Vector(1, 0)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
             }
         } else {
-            leftFront.setPower(0);
-            leftRear.setPower(0);
-            rightFront.setPower(0);
-            rightRear.setPower(0);
-            for (DcMotorEx motor : motors) {
-                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            }
+            stopRobot();
             double average = 0;
             for (Double velocity : velocities) {
                 average += velocity;
             }
-            average /= (double) velocities.size();
-
-            telemetryA.addData("forward velocity:", average);
-            telemetryA.update();
+            average /= velocities.size();
+            telemetry.addData("forward velocity:", average);
+            telemetry.update();
         }
+    }
+
+    /**
+     * This stops the OpMode by setting the drive motors to run at 0 power.
+     */
+    public void stopRobot() {
+        follower.startTeleopDrive(true);
+        follower.setTeleOpDrive(0,0,0,true);
     }
 }

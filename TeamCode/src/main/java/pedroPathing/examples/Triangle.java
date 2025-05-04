@@ -3,18 +3,15 @@ package pedroPathing.examples;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.PathChain;
-import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Constants;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import pedroPathing.Constants;
 
 
 /**
@@ -48,8 +45,6 @@ public class Triangle extends OpMode {
         if (follower.atParametricEnd()) {
             follower.followPath(triangle, true);
         }
-
-        follower.telemetryDebug(telemetryA);
     }
 
     /**
@@ -58,15 +53,15 @@ public class Triangle extends OpMode {
      */
     @Override
     public void init() {
-        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
 
         triangle = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(startPose), new Point(interPose)))
+                .addPath(new BezierLine(startPose, interPose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), interPose.getHeading())
-                .addPath(new BezierLine(new Point(interPose), new Point(endPose)))
+                .addPath(new BezierLine(interPose, endPose))
                 .setLinearHeadingInterpolation(interPose.getHeading(), endPose.getHeading())
-                .addPath(new BezierLine(new Point(endPose), new Point(startPose)))
+                .addPath(new BezierLine(endPose, startPose))
                 .setLinearHeadingInterpolation(endPose.getHeading(), startPose.getHeading())
                 .build();
 

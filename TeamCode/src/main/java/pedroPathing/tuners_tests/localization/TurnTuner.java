@@ -3,17 +3,13 @@ package pedroPathing.tuners_tests.localization;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.pedropathing.util.Constants;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import com.pedropathing.localization.PoseUpdater;
 import com.pedropathing.util.DashboardPoseTracker;
 import com.pedropathing.util.Drawing;
-
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import pedroPathing.Constants;
 
 /**
  * This is the TurnTuner OpMode. This tracks the turning movement of the robot and displays the
@@ -31,7 +27,7 @@ import pedroPathing.constants.LConstants;
 @Config
 @Autonomous(name = "Turn Localizer Tuner", group = ".Localization")
 public class TurnTuner extends OpMode {
-    private PoseUpdater poseUpdater;
+    private Follower follower;
     private DashboardPoseTracker dashboardPoseTracker;
 
     private Telemetry telemetryA;
@@ -43,15 +39,15 @@ public class TurnTuner extends OpMode {
      */
     @Override
     public void init() {
-        poseUpdater = new PoseUpdater(hardwareMap, FConstants.class, LConstants.class);
+        follower = Constants.createFollower(hardwareMap);
 
-        dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
+        dashboardPoseTracker = follower.getDashboardPoseTracker();
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetryA.addLine("Turn your robot " + ANGLE + " radians. Your turn ticks to inches will be shown on the telemetry.");
         telemetryA.update();
 
-        Drawing.drawRobot(poseUpdater.getPose(), "#4CAF50");
+        Drawing.drawRobot(follower.getPose(), "#4CAF50");
         Drawing.sendPacket();
     }
 
@@ -61,14 +57,14 @@ public class TurnTuner extends OpMode {
      */
     @Override
     public void loop() {
-        poseUpdater.update();
+        follower.update();
 
-        telemetryA.addData("total angle", poseUpdater.getTotalHeading());
+        telemetryA.addData("total angle", follower.getTotalHeading());
         telemetryA.addLine("The multiplier will display what your turn ticks to inches should be to scale your current angle to " + ANGLE + " radians.");
-        telemetryA.addData("multiplier", ANGLE / (poseUpdater.getTotalHeading() / poseUpdater.getLocalizer().getTurningMultiplier()));
+        telemetryA.addData("multiplier", ANGLE / (follower.getTotalHeading() / follower.getPoseTracker().getLocalizer().getTurningMultiplier()));
 
         Drawing.drawPoseHistory(dashboardPoseTracker, "#4CAF50");
-        Drawing.drawRobot(poseUpdater.getPose(), "#4CAF50");
+        Drawing.drawRobot(follower.getPose(), "#4CAF50");
         Drawing.sendPacket();
     }
 }
