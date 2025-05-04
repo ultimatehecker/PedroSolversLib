@@ -1,5 +1,6 @@
 package pedroPathing;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerBuilder;
 import com.pedropathing.follower.FollowerConstants;
@@ -10,6 +11,7 @@ import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+@Config
 public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
