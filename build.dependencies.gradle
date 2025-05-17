@@ -17,7 +17,7 @@ dependencies {
     implementation 'org.firstinspires.ftc:Hardware:10.2.0'
     implementation 'org.firstinspires.ftc:FtcCommon:10.2.0'
     implementation 'org.firstinspires.ftc:Vision:10.2.0'
-    implementation 'com.pedropathing:dev-local:1.1.0-local10'
+    implementation 'com.pedropathing:dev:1.1.0-dev1'
 
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.2.0'
