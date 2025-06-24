@@ -54,6 +54,7 @@ public class LocalizationTest extends OpMode {
     @Override
     public void start() {
         follower.startTeleopDrive();
+        follower.update();
     }
 
     /**
