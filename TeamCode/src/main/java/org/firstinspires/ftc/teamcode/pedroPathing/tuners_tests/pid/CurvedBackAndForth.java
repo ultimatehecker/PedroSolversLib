@@ -49,10 +49,11 @@ public class CurvedBackAndForth extends OpMode {
     public void init() {
         follower = Constants.createFollower(hardwareMap);
 
-       /**blah forwards = new Path(new BezierCurve(new Pose(), new Pose(Math.abs(DISTANCE),0), new Pose(Math.abs(DISTANCE),DISTANCE)));
-      /**blah  backwards = new Path(new BezierCurve(new Pose(Math.abs(DISTANCE),DISTANCE), new Pose(Math.abs(DISTANCE),0), new Pose(0,0)));
+        forwards = new Path(new BezierCurve(new Pose(), new Pose(Math.abs(DISTANCE),0), new Pose(Math.abs(DISTANCE),DISTANCE)));
+        backwards = new Path(new BezierCurve(new Pose(Math.abs(DISTANCE),DISTANCE), new Pose(Math.abs(DISTANCE),0), new Pose(0,0)));
 
-        backwards.setReversed(true);**/
+        backwards.setTangentHeadingInterpolation();
+        backwards.reverseHeadingInterpolation();
 
         follower.followPath(forwards);
 
