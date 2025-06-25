@@ -18,8 +18,9 @@ dependencies {
     implementation 'org.firstinspires.ftc:Vision:10.2.0'
 
     implementation 'com.pedropathing:dev:1.1.0-dev14'
+    implementation 'com.pedropathing:telemetry:0.0.1'
+    implementation 'com.bylazar:ftcontrol:0.6.7'
 
     implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation "com.bylazar:ftcontrol:0.6.7"
 }
 
