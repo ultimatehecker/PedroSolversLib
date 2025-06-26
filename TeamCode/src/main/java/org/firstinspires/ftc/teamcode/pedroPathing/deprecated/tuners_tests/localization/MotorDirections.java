@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.tuners_tests.localization;
+package org.firstinspires.ftc.teamcode.pedroPathing.deprecated.tuners_tests.localization;
 
 import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.Configurable;
@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-//@Configurable
+
 @TeleOp(name = "Motor Directions", group = "Teleop Test")
 public class MotorDirections extends OpMode {
     public static MecanumConstants constants;

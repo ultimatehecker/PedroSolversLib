@@ -39,9 +39,6 @@ public class Constants {
             .motorCachingThreshold(0.01)
             .useBrakeModeInTeleOp(false);
 
-    public static OTOSConstants otosConstants = new OTOSConstants()
-            .offset(new SparkFunOTOS.Pose2D(3,2,Math.toRadians(270)));
-
     public static PinpointConstants pinpointConstants = new PinpointConstants()
             .forwardY(-5)
             .strafeX(0.5)
@@ -55,7 +52,6 @@ public class Constants {
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .mecanumDrivetrain(driveConstants)
-//                .OTOSLocalizer(otosConstants)
                 .pinpointLocalizer(pinpointConstants)
                 .pathConstraints(pathConstraints)
                 .build();

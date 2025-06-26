@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.tuners_tests.localization;
+package org.firstinspires.ftc.teamcode.pedroPathing.deprecated.tuners_tests.localization;
 
 import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.Configurable;
