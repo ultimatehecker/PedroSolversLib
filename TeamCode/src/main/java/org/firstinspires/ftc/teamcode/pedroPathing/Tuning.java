@@ -59,11 +59,16 @@ public class Tuning extends SelectableOpMode {
     }
 
     @Override
-    public void start() {
-        super.start();
+    public void onSelect() {
         follower = Constants.createFollower(hardwareMap);
         dashboardPoseTracker = follower.getDashboardPoseTracker();
         telemetryM = Panels.getTelemetry();
+    }
+
+    @Override
+    public void onLog(String line) {
+        if (telemetryM != null)
+            telemetryM.debug(line);
     }
     
     public static void drawCurrent() {
