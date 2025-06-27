@@ -506,7 +506,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
     /** This starts the OpMode by setting the drive motors to run forward at full power. */
     @Override
     public void start() {
-        follower.startTeleopDrive(true);
+        follower.startTeleopDrive(false);
         follower.update();
     }
 
@@ -600,7 +600,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
     /** This starts the OpMode by setting the drive motors to run forward at full power. */
     @Override
     public void start() {
-        follower.startTeleopDrive(true);
+        follower.startTeleopDrive(false);
         follower.update();
     }
 
