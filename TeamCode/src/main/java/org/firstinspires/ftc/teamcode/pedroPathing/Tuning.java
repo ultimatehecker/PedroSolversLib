@@ -324,7 +324,8 @@ class ForwardVelocityTuner extends OpMode {
         for (int i = 0; i < RECORD_NUMBER; i++) {
             velocities.add(0.0);
         }
-        follower.startTeleopDrive(false);
+        follower.startTeleopDrive(true);
+        follower.update();
         end = false;
     }
 
@@ -336,8 +337,7 @@ class ForwardVelocityTuner extends OpMode {
      */
     @Override
     public void loop() {
-        follower.setTeleOpDrive(1,1,1,true);
-
+        
         if (gamepad1.cross || gamepad1.a) {
             stopRobot();
             requestOpModeStop();
@@ -346,11 +346,13 @@ class ForwardVelocityTuner extends OpMode {
         follower.update();
         drawCurrentAndHistory();
 
+
         if (!end) {
             if (Math.abs(follower.getPose().getX()) > DISTANCE) {
                 end = true;
                 stopRobot();
             } else {
+                follower.setTeleOpDrive(1,1,1,true);
                 double currentVelocity = Math.abs(MathFunctions.dotProduct(follower.getVelocity(), new Vector(1, 0)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -416,7 +418,8 @@ class LateralVelocityTuner extends OpMode {
         for (int i = 0; i < RECORD_NUMBER; i++) {
             velocities.add(0.0);
         }
-        stopRobot();
+        follower.startTeleopDrive(true);
+        follower.update();
     }
 
     /**
@@ -440,6 +443,7 @@ class LateralVelocityTuner extends OpMode {
                 end = true;
                 stopRobot();
             } else {
+                follower.setTeleOpDrive(1,1,1,true);
                 double currentVelocity = Math.abs(MathFunctions.dotProduct(follower.getVelocity(), new Vector(1, Math.PI / 2)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -502,7 +506,8 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
     /** This starts the OpMode by setting the drive motors to run forward at full power. */
     @Override
     public void start() {
-        follower.startTeleopDrive(false);
+        follower.startTeleopDrive(true);
+        follower.update();
     }
 
     /**
@@ -530,6 +535,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
                     stopping = true;
                     stopRobot();
                 }
+                follower.setTeleOpDrive(1,1,1,true);
             } else {
                 double currentVelocity = MathFunctions.dotProduct(follower.getVelocity(), heading);
                 accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
@@ -594,7 +600,8 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
     /** This starts the OpMode by setting the drive motors to run forward at full power. */
     @Override
     public void start() {
-        stopRobot();
+        follower.startTeleopDrive(true);
+        follower.update();
     }
 
     /**
@@ -622,6 +629,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
                     stopping = true;
                     stopRobot();
                 }
+                follower.setTeleOpDrive(1,1,1,true);
             } else {
                 double currentVelocity = MathFunctions.dotProduct(follower.getVelocity(), heading);
                 accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
