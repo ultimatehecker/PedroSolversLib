@@ -443,7 +443,7 @@ class LateralVelocityTuner extends OpMode {
                 end = true;
                 stopRobot();
             } else {
-                follower.setTeleOpDrive(0,1,0,true);
+                follower.setTeleOpDrive(0,-1,0,true);
                 double currentVelocity = Math.abs(MathFunctions.dotProduct(follower.getVelocity(), new Vector(1, Math.PI / 2)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -508,6 +508,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
     public void start() {
         follower.startTeleopDrive(false);
         follower.update();
+        follower.setTeleOpDrive(1,0,0,true);
     }
 
     /**
@@ -535,7 +536,6 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
                     stopping = true;
                     stopRobot();
                 }
-                follower.setTeleOpDrive(1,0,0,true);
             } else {
                 double currentVelocity = MathFunctions.dotProduct(follower.getVelocity(), heading);
                 accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
@@ -602,6 +602,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
     public void start() {
         follower.startTeleopDrive(false);
         follower.update();
+        follower.setTeleOpDrive(0,-1,0,true);
     }
 
     /**
@@ -629,7 +630,6 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
                     stopping = true;
                     stopRobot();
                 }
-                follower.setTeleOpDrive(0,1,0,true);
             } else {
                 double currentVelocity = MathFunctions.dotProduct(follower.getVelocity(), heading);
                 accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
