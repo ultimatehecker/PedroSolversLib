@@ -18,6 +18,7 @@ import com.pedropathing.util.*;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the Tuning class. It contains a selection menu for various tuning OpModes.
@@ -67,9 +68,9 @@ public class Tuning extends SelectableOpMode {
     }
 
     @Override
-    public void onLog(String line) {
-        if (telemetryM != null)
-            telemetryM.debug(line);
+    public void onLog(List<String> lines) {
+        Panels.getTelemetry().debug(lines.toArray(new String[0]));
+        Panels.getTelemetry().update();
     }
     
     public static void drawCurrent() {
@@ -124,7 +125,7 @@ class LocalizationTest extends OpMode {
      */
     @Override
     public void loop() {
-        follower.setTeleOpDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        follower.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
 
         telemetryM.debug("x:" + follower.getPose().getX());
@@ -361,11 +362,11 @@ class ForwardVelocityTuner extends OpMode {
         } else {
             stopRobot();
             double average = 0;
-            for (Double velocity : velocities) {
+            for (double velocity : velocities) {
                 average += velocity;
             }
             average /= velocities.size();
-            telemetryM.debug("forward velocity:", average);
+            telemetryM.debug("forward velocity:" + average);
             telemetryM.update(telemetry);
         }
     }
@@ -444,7 +445,7 @@ class LateralVelocityTuner extends OpMode {
                 end = true;
                 stopRobot();
             } else {
-                follower.setTeleOpDrive(0,-1,0,true);
+                follower.setTeleOpDrive(0,1,0,true);
                 double currentVelocity = Math.abs(MathFunctions.dotProduct(follower.getVelocity(), new Vector(1, Math.PI / 2)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -452,12 +453,12 @@ class LateralVelocityTuner extends OpMode {
         } else {
             stopRobot();
             double average = 0;
-            for (Double velocity : velocities) {
+            for (double velocity : velocities) {
                 average += velocity;
             }
             average /= velocities.size();
 
-            telemetryM.debug("strafe velocity:", average);
+            telemetryM.debug("strafe velocity:" + average);
             telemetryM.update(telemetry);
         }
     }
@@ -548,12 +549,12 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
             }
         } else {
             double average = 0;
-            for (Double acceleration : accelerations) {
+            for (double acceleration : accelerations) {
                 average += acceleration;
             }
             average /= accelerations.size();
 
-            telemetryM.debug("forward zero power acceleration (deceleration):", average);
+            telemetryM.debug("forward zero power acceleration (deceleration):" + average);
             telemetryM.update(telemetry);
         }
     }
@@ -603,7 +604,7 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
     public void start() {
         follower.startTeleopDrive(false);
         follower.update();
-        follower.setTeleOpDrive(0,-1,0,true);
+        follower.setTeleOpDrive(0,1,0,true);
     }
 
     /**
@@ -642,12 +643,12 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
             }
         } else {
             double average = 0;
-            for (Double acceleration : accelerations) {
+            for (double acceleration : accelerations) {
                 average += acceleration;
             }
             average /= accelerations.size();
 
-            telemetryM.debug("lateral zero power acceleration (deceleration):", average);
+            telemetryM.debug("lateral zero power acceleration (deceleration):" + average);
             telemetryM.update(telemetry);
         }
     }
