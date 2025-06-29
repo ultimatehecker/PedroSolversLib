@@ -18,6 +18,14 @@ apply from: '../build.dependencies.gradle'
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
 
+    //ADD THIS
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 24
+    }
+    //
+
     packagingOptions {
         jniLibs.useLegacyPackaging true
     }
@@ -27,6 +35,9 @@ dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.4.21'
+    implementation "org.solverslib:core:0.3.1" // core
+    implementation "org.solverslib:pedroPathing:0.3.1" // pedroPathing
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.0.0'
 }
