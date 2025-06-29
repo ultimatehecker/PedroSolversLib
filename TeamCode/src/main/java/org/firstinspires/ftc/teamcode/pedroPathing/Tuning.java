@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.telemetryM;
 
 import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.Configurable;
+import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.*;
@@ -30,7 +31,11 @@ import java.util.List;
 @TeleOp(name = "Tuning", group = "Pedro Pathing")
 public class Tuning extends SelectableOpMode {
     public static Follower follower;
+
+    @IgnoreConfigurable
     static DashboardPoseTracker dashboardPoseTracker;
+
+    @IgnoreConfigurable
     static TelemetryManager telemetryM;
 
     public Tuning() {
