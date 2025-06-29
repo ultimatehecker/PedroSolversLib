@@ -51,10 +51,10 @@ public class Tuning extends SelectableOpMode {
                 p.add("Translational Tuner", TranslationalTuner::new);
                 p.add("Heading Tuner", HeadingTuner::new);
                 p.add("Drive Tuner", DriveTuner::new);
-                p.add("Line Test", LineTest::new);
                 p.add("Centripetal Tuner", CentripetalTuner::new);
             });
             s.folder("Tests", p -> {
+                p.add("Line Test", LineTest::new);
                 p.add("Triangle", Triangle::new);
             });
         });
@@ -296,8 +296,7 @@ class TurnTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class ForwardVelocityTuner extends OpMode {
-    private ArrayList<Double> velocities = new ArrayList<>();
-
+    private final ArrayList<Double> velocities = new ArrayList<>();
     public static double DISTANCE = 48;
     public static double RECORD_NUMBER = 10;
 
@@ -388,7 +387,7 @@ class ForwardVelocityTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class LateralVelocityTuner extends OpMode {
-    private ArrayList<Double> velocities = new ArrayList<>();
+    private final ArrayList<Double> velocities = new ArrayList<>();
 
     public static double DISTANCE = 48;
     public static double RECORD_NUMBER = 10;
@@ -480,7 +479,7 @@ class LateralVelocityTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class ForwardZeroPowerAccelerationTuner extends OpMode {
-    private ArrayList<Double> accelerations = new ArrayList<>();
+    private final ArrayList<Double> accelerations = new ArrayList<>();
     public static double VELOCITY = 30;
 
     private double previousVelocity;
@@ -576,7 +575,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class LateralZeroPowerAccelerationTuner extends OpMode {
-    private ArrayList<Double> accelerations = new ArrayList<>();
+    private final ArrayList<Double> accelerations = new ArrayList<>();
     public static double VELOCITY = 30;
     private double previousVelocity;
     private long previousTimeNano;
@@ -1042,7 +1041,7 @@ class Triangle extends OpMode {
     public void start() {
         follower.setStartingPose(startPose);
 
-        triangle = follower.pathBuilder()
+        triangle = Follower.pathBuilder()
                 .addPath(new BezierLine(startPose, interPose))
                 .setLinearHeadingInterpolation(startPose.getHeading(), interPose.getHeading())
                 .addPath(new BezierLine(interPose, endPose))

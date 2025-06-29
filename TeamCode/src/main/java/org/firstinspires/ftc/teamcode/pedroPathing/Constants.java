@@ -7,13 +7,10 @@ import com.pedropathing.follower.FollowerBuilder;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.drivetrain.MecanumConstants;
 import com.pedropathing.localization.GoBildaPinpointDriver;
-import com.pedropathing.localization.constants.OTOSConstants;
 import com.pedropathing.localization.constants.PinpointConstants;
 import com.pedropathing.paths.PathConstraints;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
