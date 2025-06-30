@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.stopRobot;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.telemetryM;
 
 import com.bylazar.ftcontrol.panels.Panels;
+import com.bylazar.ftcontrol.panels.configurables.ConfigurablesManager;
 import com.bylazar.ftcontrol.panels.configurables.annotations.Configurable;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
@@ -71,8 +72,10 @@ public class Tuning extends SelectableOpMode {
 
     @Override
     public void onSelect() {
-        if (follower == null)
+        if (follower == null) {
             follower = Constants.createFollower(hardwareMap);
+            ConfigurablesManager.INSTANCE.init(hardwareMap.appContext);
+        }
 
         dashboardPoseTracker = follower.getDashboardPoseTracker();
         telemetryM = Panels.getTelemetry();
