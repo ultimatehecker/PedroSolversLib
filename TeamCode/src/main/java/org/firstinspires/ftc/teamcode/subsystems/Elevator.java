@@ -1,0 +1,160 @@
+package org.firstinspires.ftc.teamcode.subsystems;
+
+import com.bylazar.ftcontrol.panels.Panels;
+import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
+import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
+
+import com.pedropathing.util.DashboardPoseTracker;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.Range;
+
+import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.controller.PIDFController;
+import com.seattlesolvers.solverslib.controller.wpilibcontroller.ElevatorFeedforward;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.solversHardware.SolversMotor;
+import com.seattlesolvers.solverslib.solversHardware.SolversServo;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utilities.constansts.ElevatorConstants;
+
+public class Elevator extends SubsystemBase {
+    public enum ElevatorState {
+        RETRACTED,
+        TRANSFER,
+        SPECIMAN_LOW_READY,
+        SPECIMAN_LOW_SCORE,
+        SPECIMAN_HIGH_READY,
+        SPECIMAN_HIGH_SCORE,
+        SAMPLE_LOW_SCORE,
+        SAMPLE_HIGH_SCORE
+    }
+
+    private SolversMotor elevatorMotor;
+    private Motor.Encoder elevatorEncoder;
+    private TouchSensor homingSensor;
+
+    private SolversServo leftArmServo;
+    private SolversServo rightArmServo;
+    private SolversServo wristServo;
+    private SolversServo clawServo;
+
+    private final PIDFController elevatorController = new PIDFController(0.007, 0, 0.00017, 0.0);
+    private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.0, 0.0, 0.0, 0.0);
+    public ElevatorState elevatorState;
+
+    private double target;
+    private boolean elevatorReached;
+    private boolean elevatorRetracted;
+
+    private Telemetry telemetry;
+
+    @IgnoreConfigurable
+    static TelemetryManager telemetryManager;
+
+    public Elevator(HardwareMap aHardwareMap, Telemetry telemetry) {
+        //elevatorMotor = new Motor(aHardwareMap, ElevatorConstants.elevatorMotorID, Motor.GoBILDA.RPM_312);
+        elevatorMotor = new SolversMotor(aHardwareMap.get(DcMotor.class, ElevatorConstants.elevatorMotorID), 0.01);
+        elevatorEncoder = new Motor(aHardwareMap, ElevatorConstants.elevatorMotorID).encoder;
+        homingSensor = aHardwareMap.get(TouchSensor.class, ElevatorConstants.elevatorLimitSwitchID);
+
+        leftArmServo = new SolversServo(aHardwareMap.get(Servo.class, "leftouttakeArm"), 0.01);
+        rightArmServo = new SolversServo(aHardwareMap.get(Servo.class, "rightouttakeArm"), 0.01);
+        wristServo = new SolversServo(aHardwareMap.get(Servo.class, "outtakeWrist"), 0.01);
+        clawServo = new SolversServo(aHardwareMap.get(Servo.class, "outtakeClaw"), 0.01);
+
+        leftArmServo.setDirection(Servo.Direction.REVERSE);
+        rightArmServo.setDirection(Servo.Direction.REVERSE);
+        wristServo.setDirection(Servo.Direction.FORWARD);
+        clawServo.setDirection(Servo.Direction.REVERSE);
+
+        elevatorMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevatorEncoder.reset();
+
+        telemetryManager = Panels.getTelemetry();
+        this.telemetry = telemetry;
+    }
+
+    public int getElevatorPosition() {
+        return elevatorEncoder.getPosition();
+    }
+
+    public void setTargetPosition(ElevatorState elevatorState) {
+        double unClippedTarget;
+        switch (elevatorState) {
+            case RETRACTED:
+                unClippedTarget = ElevatorConstants.retractionHeight;
+                break;
+            case TRANSFER:
+                unClippedTarget = ElevatorConstants.transferHeight;
+                break;
+            case SPECIMAN_LOW_READY:
+                unClippedTarget = ElevatorConstants.lowSpecimanReady;
+                break;
+            case SPECIMAN_LOW_SCORE:
+                unClippedTarget = ElevatorConstants.lowSpecimanScore;
+                break;
+            case SPECIMAN_HIGH_READY:
+                unClippedTarget = ElevatorConstants.highSpecimanReady;
+                break;
+            case SPECIMAN_HIGH_SCORE:
+                unClippedTarget = ElevatorConstants.highSpecimanScore;
+                break;
+            case SAMPLE_LOW_SCORE:
+                unClippedTarget = ElevatorConstants.lowBucketHeight;
+                break;
+            case SAMPLE_HIGH_SCORE:
+                unClippedTarget = ElevatorConstants.highBucketHeight;
+                break;
+            default:
+                unClippedTarget = 0;
+        }
+
+        this.target = Range.clip(unClippedTarget, 0.0, 4000);
+        this.elevatorState = elevatorState;
+    }
+
+    public void toPosition() {
+        double power = elevatorController.calculate(getElevatorPosition(), target);
+
+        if (target == 0 && !isReached()) {
+            power -= 0.1;
+        }
+
+        if (isRetracted()) {
+            elevatorMotor.setPower(0);
+        } else {
+            elevatorMotor.setPower(power);
+        }
+    }
+
+    public boolean isHomingSwitchTriggered() {
+        return homingSensor.isPressed();
+    }
+
+    public boolean isReached() {
+        return elevatorReached = elevatorController.atSetPoint()
+                || (target == 0 && getElevatorPosition() < 15 && isHomingSwitchTriggered())
+                || (getElevatorPosition() >= target && (target == ElevatorConstants.highBucketHeight || target == ElevatorConstants.lowBucketHeight))
+                || (target == ElevatorConstants.transferHeight + 50 && getElevatorPosition() > ElevatorConstants.transferHeight && getElevatorPosition() < ElevatorConstants.transferHeight + 65);
+    }
+
+    public boolean isRetracted() {
+        return elevatorRetracted = (target <= 0) && elevatorReached;
+    }
+
+
+    @Override
+    public void periodic() {
+        telemetryManager.debug("Elevator Position: " + getElevatorPosition());
+        telemetryManager.debug("Elevator Target: " + target);
+        telemetryManager.debug("Elevator Reached: " + isReached());
+        telemetryManager.debug("Elevator Retracted: " + isRetracted());
+        telemetryManager.debug("Elevator Homing Sensor: " + isHomingSwitchTriggered());
+    }
+}
