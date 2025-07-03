@@ -5,22 +5,30 @@ repositories {
 
     maven { url= "https://maven.pedropathing.com/" }
     maven { url = "https://mymaven.bylazar.com/releases" }
-    maven { url = 'https://maven.brott.dev/' }
 }
 
+configurations.configureEach {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+
 dependencies {
-    implementation 'org.firstinspires.ftc:Inspection:10.2.0'
-    implementation 'org.firstinspires.ftc:Blocks:10.2.0'
-    implementation 'org.firstinspires.ftc:RobotCore:10.2.0'
-    implementation 'org.firstinspires.ftc:RobotServer:10.2.0'
-    implementation 'org.firstinspires.ftc:OnBotJava:10.2.0'
-    implementation 'org.firstinspires.ftc:Hardware:10.2.0'
-    implementation 'org.firstinspires.ftc:FtcCommon:10.2.0'
-    implementation 'org.firstinspires.ftc:Vision:10.2.0'
+    implementation 'org.firstinspires.ftc:Inspection:10.3.0'
+    implementation 'org.firstinspires.ftc:Blocks:10.3.0'
+    implementation 'org.firstinspires.ftc:RobotCore:10.3.0'
+    implementation 'org.firstinspires.ftc:RobotServer:10.3.0'
+    implementation 'org.firstinspires.ftc:OnBotJava:10.3.0'
+    implementation 'org.firstinspires.ftc:Hardware:10.3.0'
+    implementation 'org.firstinspires.ftc:FtcCommon:10.3.0'
+    implementation 'org.firstinspires.ftc:Vision:10.3.0'
 
-    implementation 'com.pedropathing:dev:1.1.0-dev5'
+    implementation('com.pedropathing:dev:1.1.0-SNAPSHOT') {
+        changing = true
+    }
 
-    implementation 'androidx.appcompat:appcompat:1.7.1'
-    implementation "com.bylazar:ftcontrol:0.6.5"
+    implementation 'com.pedropathing:telemetry:0.0.6'
+    implementation 'com.bylazar:ftcontrol:0.6.8'
+
+    implementation 'androidx.appcompat:appcompat:1.7.0'
 }
 

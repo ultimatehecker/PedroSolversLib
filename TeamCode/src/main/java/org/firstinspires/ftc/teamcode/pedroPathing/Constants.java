@@ -1,23 +1,18 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import com.bylazar.ftcontrol.panels.configurables.annotations.Configurable;
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerBuilder;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.drivetrain.MecanumConstants;
-import com.pedropathing.localization.GoBildaPinpointDriver;
-import com.pedropathing.localization.constants.OTOSConstants;
 import com.pedropathing.localization.constants.PinpointConstants;
 import com.pedropathing.paths.PathConstraints;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-//@Configurable
 public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
@@ -41,9 +36,6 @@ public class Constants {
             .motorCachingThreshold(0.01)
             .useBrakeModeInTeleOp(false);
 
-    public static OTOSConstants otosConstants = new OTOSConstants()
-            .offset(new SparkFunOTOS.Pose2D(3,2,Math.toRadians(270)));
-
     public static PinpointConstants pinpointConstants = new PinpointConstants()
             .forwardY(-5)
             .strafeX(0.5)
@@ -57,7 +49,6 @@ public class Constants {
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .mecanumDrivetrain(driveConstants)
-//                .OTOSLocalizer(otosConstants)
                 .pinpointLocalizer(pinpointConstants)
                 .pathConstraints(pathConstraints)
                 .build();
