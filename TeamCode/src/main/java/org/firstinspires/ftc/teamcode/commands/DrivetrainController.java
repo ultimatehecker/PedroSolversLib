@@ -28,7 +28,7 @@ public class DrivetrainController extends CommandBase {
 
     @Override
     public void execute() {
-        drivetrain.setMovementVectors(forward.getAsDouble(), -strafe.getAsDouble(), -rotation.getAsDouble(), false);
+        drivetrain.setMovementVectors(forward.getAsDouble(), -strafe.getAsDouble(), -rotation.getAsDouble() * 0.6, false);
         drivetrain.follower.update();
     }
 }
