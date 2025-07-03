@@ -9,12 +9,12 @@ public class ElevatorController extends CommandBase {
     private final Elevator elevator;
     private final Elevator.ElevatorState elevatorState;
 
-    private ElapsedTime elevatorTimer;
+    private boolean tryingToFinish;
 
     public ElevatorController(Elevator elevator, Elevator.ElevatorState elevatorState) {
         this.elevator = elevator;
         this.elevatorState = elevatorState;
-        this.elevatorTimer = new ElapsedTime();
+        this.tryingToFinish = false;
 
         addRequirements(elevator);
     }
@@ -22,21 +22,20 @@ public class ElevatorController extends CommandBase {
     @Override
     public void initialize() {
         elevator.setTargetPosition(elevatorState);
-        elevatorTimer.startTime();
     }
 
     @Override
     public void execute() {
         elevator.toPosition();
+
+        if(elevator.isReached()) {
+            tryingToFinish = true;
+            elevator.elevatorTimer.resetTimer();
+        }
     }
 
     @Override
     public boolean isFinished() {
-        return elevator.isReached();
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        elevatorTimer.reset();
+        return elevator.elevatorTimer.getElapsedTimeSeconds() > 0.1 && tryingToFinish;
     }
 }

@@ -4,7 +4,7 @@ import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 
-import com.pedropathing.util.DashboardPoseTracker;
+import com.pedropathing.util.Timer;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -44,8 +44,9 @@ public class Elevator extends SubsystemBase {
     private SolversServo wristServo;
     private SolversServo clawServo;
 
-    private final PIDFController elevatorController = new PIDFController(0.007, 0, 0.00017, 0.0);
-    private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.0, 0.0, 0.0, 0.0);
+    private final PIDFController elevatorController = new PIDFController(ElevatorConstants.P, ElevatorConstants.I, ElevatorConstants.D, ElevatorConstants.F);
+
+    private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.1, 0.15, 0.0, 0.0);
     public ElevatorState elevatorState;
 
     private double target;
@@ -53,6 +54,7 @@ public class Elevator extends SubsystemBase {
     private boolean elevatorRetracted;
 
     private Telemetry telemetry;
+    public Timer elevatorTimer;
 
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
@@ -73,15 +75,21 @@ public class Elevator extends SubsystemBase {
         wristServo.setDirection(Servo.Direction.FORWARD);
         clawServo.setDirection(Servo.Direction.REVERSE);
 
+        elevatorController.setTolerance(25);
         elevatorMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         elevatorEncoder.reset();
 
         telemetryManager = Panels.getTelemetry();
+        elevatorTimer = new Timer();
         this.telemetry = telemetry;
     }
 
-    public int getElevatorPosition() {
+    public int getPosition() {
         return elevatorEncoder.getPosition();
+    }
+
+    public double getCorrectedVelocity() {
+        return elevatorEncoder.getCorrectedVelocity();
     }
 
     public void setTargetPosition(ElevatorState elevatorState) {
@@ -117,10 +125,11 @@ public class Elevator extends SubsystemBase {
 
         this.target = Range.clip(unClippedTarget, 0.0, 4000);
         this.elevatorState = elevatorState;
+        this.elevatorReached = false;
     }
 
     public void toPosition() {
-        double power = elevatorController.calculate(getElevatorPosition(), target);
+        double power = elevatorController.calculate(getPosition(), target);
 
         if (target == 0 && !isReached()) {
             power -= 0.1;
@@ -129,7 +138,7 @@ public class Elevator extends SubsystemBase {
         if (isRetracted()) {
             elevatorMotor.setPower(0);
         } else {
-            elevatorMotor.setPower(power);
+            elevatorMotor.setPower(power + elevatorFeedforward.calculate(getCorrectedVelocity()));
         }
     }
 
@@ -138,20 +147,28 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean isReached() {
-        return elevatorReached = elevatorController.atSetPoint()
-                || (target == 0 && getElevatorPosition() < 15 && isHomingSwitchTriggered())
-                || (getElevatorPosition() >= target && (target == ElevatorConstants.highBucketHeight || target == ElevatorConstants.lowBucketHeight))
-                || (target == ElevatorConstants.transferHeight + 50 && getElevatorPosition() > ElevatorConstants.transferHeight && getElevatorPosition() < ElevatorConstants.transferHeight + 65);
+        return elevatorReached = elevatorController.atSetPoint() && (getCorrectedVelocity() < 1)
+                || (target == 0 && getPosition() < 15 && isHomingSwitchTriggered())
+                || (getPosition() >= target && (target == ElevatorConstants.highBucketHeight || target == ElevatorConstants.lowBucketHeight))
+                || (target == ElevatorConstants.transferHeight + 50 && getPosition() > ElevatorConstants.transferHeight && getPosition() < ElevatorConstants.transferHeight + 65);
     }
 
     public boolean isRetracted() {
         return elevatorRetracted = (target <= 0) && elevatorReached;
     }
 
+    public void onInit() {
+        setTargetPosition(ElevatorState.RETRACTED);
+        elevatorEncoder.reset();
+    }
+
 
     @Override
     public void periodic() {
-        telemetryManager.debug("Elevator Position: " + getElevatorPosition());
+        telemetryManager.graph("Elevator Position", getPosition());
+        telemetryManager.graph("Elevator Target", target);
+        telemetryManager.debug("Elevator Position: " + getPosition());
+        telemetryManager.debug("Elevator Velocity: " + getCorrectedVelocity());
         telemetryManager.debug("Elevator Target: " + target);
         telemetryManager.debug("Elevator Reached: " + isReached());
         telemetryManager.debug("Elevator Retracted: " + isRetracted());
