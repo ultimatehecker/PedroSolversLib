@@ -19,9 +19,13 @@ public class ManipulatorController extends CommandBase {
 
     @Override
     public void initialize() {
+        manipulator.manipulatorTimer.startTime();
+    }
+
+    @Override
+    public void execute() {
         manipulator.setPosition(manipulatorState);
         manipulator.setClawOpen(clawOpen);
-        manipulator.manipulatorTimer.startTime();
     }
 
     public boolean isFinished() {

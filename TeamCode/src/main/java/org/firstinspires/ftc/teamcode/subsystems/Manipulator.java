@@ -26,6 +26,11 @@ public class Manipulator extends SubsystemBase {
         WALL_INTAKE
     }
 
+    public enum SampleSpecimanState {
+        SAMP,
+        SPEC
+    }
+
     public ManipulatorState manipulatorState;
 
     private SolversServo leftArmServo;
@@ -57,13 +62,19 @@ public class Manipulator extends SubsystemBase {
         elevatorResetSwitch = aHardwareMap.get(TouchSensor.class, "elevatorResetSwitch");
 
         leftArmServo.setDirection(Servo.Direction.REVERSE);
-        rightArmServo.setDirection(Servo.Direction.REVERSE);
+        rightArmServo.setDirection(Servo.Direction.FORWARD);
         wristServo.setDirection(Servo.Direction.FORWARD);
         clawServo.setDirection(Servo.Direction.REVERSE);
+
+        manipulatorState = ManipulatorState.TRANSFER;
 
         telemetryManager = Panels.getTelemetry();
         manipulatorTimer = new ElapsedTime();
         this.telemetry = telemetry;
+    }
+
+    public ManipulatorState getState() {
+        return manipulatorState;
     }
 
     public void setPosition(ManipulatorState manipulatorState) {
@@ -124,6 +135,11 @@ public class Manipulator extends SubsystemBase {
         double blueValue = colorSensor.blue();
 
         return true;
+    }
+
+    public void onInit() {
+        setPosition(ManipulatorState.TRANSFER);
+        setClawOpen(true);
     }
 
     @Override
