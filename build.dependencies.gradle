@@ -22,7 +22,7 @@ dependencies {
     implementation 'org.firstinspires.ftc:FtcCommon:10.3.0'
     implementation 'org.firstinspires.ftc:Vision:10.3.0'
 
-    implementation('com.pedropathing:dev:1.1.0-SNAPSHOT') {
+    implementation('com.pedropathing:ftc:1.1.0-SNAPSHOT') {
         changing = true
     }
 
