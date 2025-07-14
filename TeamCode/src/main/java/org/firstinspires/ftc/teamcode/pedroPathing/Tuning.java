@@ -13,6 +13,7 @@ import com.bylazar.ftcontrol.panels.configurables.annotations.Configurable;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.ftc.Drawing;
 import com.pedropathing.geometry.*;
 import com.pedropathing.math.*;
 import com.pedropathing.paths.*;
@@ -35,7 +36,7 @@ public class Tuning extends SelectableOpMode {
     public static Follower follower;
 
     @IgnoreConfigurable
-    static DashboardPoseTracker dashboardPoseTracker;
+    static PoseHistory PoseHistory;
 
     @IgnoreConfigurable
     static TelemetryManager telemetryM;
@@ -77,7 +78,7 @@ public class Tuning extends SelectableOpMode {
             ConfigurablesManager.INSTANCE.init(hardwareMap.appContext);
         }
 
-        dashboardPoseTracker = follower.getDashboardPoseTracker();
+        PoseHistory = follower.getPoseHistory();
         telemetryM = Panels.getTelemetry();
     }
 
@@ -93,7 +94,7 @@ public class Tuning extends SelectableOpMode {
     }
 
     public static void drawCurrentAndHistory() {
-        Drawing.drawPoseHistory(dashboardPoseTracker);
+        Drawing.drawPoseHistory(PoseHistory);
         drawCurrent();
     }
 
@@ -190,9 +191,9 @@ class ForwardTuner extends OpMode {
     public void loop() {
         follower.update();
 
-        telemetryM.debug("distance moved", follower.getPose().getX());
+        telemetryM.debug("Distance Moved: " + follower.getPose().getX());
         telemetryM.debug("The multiplier will display what your forward ticks to inches should be to scale your current distance to " + DISTANCE + " inches.");
-        telemetryM.debug("multiplier", DISTANCE / (follower.getPose().getX() / follower.getPoseTracker().getLocalizer().getForwardMultiplier()));
+        telemetryM.debug("Multiplier: " + (DISTANCE / (follower.getPose().getX() / follower.getPoseTracker().getLocalizer().getForwardMultiplier())));
         telemetryM.update(telemetry);
 
         drawCurrentAndHistory();
@@ -237,9 +238,9 @@ class LateralTuner extends OpMode {
     public void loop() {
         follower.update();
 
-        telemetryM.debug("distance moved", follower.getPose().getY());
+        telemetryM.debug("Distance Moved: " + follower.getPose().getY());
         telemetryM.debug("The multiplier will display what your strafe ticks to inches should be to scale your current distance to " + DISTANCE + " inches.");
-        telemetryM.debug("multiplier", DISTANCE / (follower.getPose().getY() / follower.getPoseTracker().getLocalizer().getLateralMultiplier()));
+        telemetryM.debug("Multiplier: " + (DISTANCE / (follower.getPose().getY() / follower.getPoseTracker().getLocalizer().getLateralMultiplier())));
         telemetryM.update(telemetry);
 
         drawCurrentAndHistory();
@@ -285,9 +286,9 @@ class TurnTuner extends OpMode {
     public void loop() {
         follower.update();
 
-        telemetryM.debug("total angle", follower.getTotalHeading());
+        telemetryM.debug("Total Angle: " + follower.getTotalHeading());
         telemetryM.debug("The multiplier will display what your turn ticks to inches should be to scale your current angle to " + ANGLE + " radians.");
-        telemetryM.debug("multiplier", ANGLE / (follower.getTotalHeading() / follower.getPoseTracker().getLocalizer().getTurningMultiplier()));
+        telemetryM.debug("Multiplier: " + (ANGLE / (follower.getTotalHeading() / follower.getPoseTracker().getLocalizer().getTurningMultiplier())));
         telemetryM.update(telemetry);
 
         drawCurrentAndHistory();
@@ -368,7 +369,7 @@ class ForwardVelocityTuner extends OpMode {
                 stopRobot();
             } else {
                 follower.setTeleOpDrive(1,0,0,true);
-                double currentVelocity = Math.abs(MathFunctions.dotProduct(follower.getVelocity(), new Vector(1, 0)));
+                double currentVelocity = Math.abs(follower.getVelocity().dot(new Vector(1, 0)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
             }
@@ -467,7 +468,7 @@ class LateralVelocityTuner extends OpMode {
                 stopRobot();
             } else {
                 follower.setTeleOpDrive(0,1,0,true);
-                double currentVelocity = Math.abs(MathFunctions.dotProduct(follower.getVelocity(), new Vector(1, Math.PI / 2)));
+                double currentVelocity = Math.abs(follower.getVelocity().dot(new Vector(1, Math.PI / 2)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
             }
@@ -561,14 +562,14 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
         Vector heading = new Vector(1.0, follower.getPose().getHeading());
         if (!end) {
             if (!stopping) {
-                if (MathFunctions.dotProduct(follower.getVelocity(), heading) > VELOCITY) {
-                    previousVelocity = MathFunctions.dotProduct(follower.getVelocity(), heading);
+                if (follower.getVelocity().dot(heading) > VELOCITY) {
+                    previousVelocity = follower.getVelocity().dot(heading);
                     previousTimeNano = System.nanoTime();
                     stopping = true;
                     stopRobot();
                 }
             } else {
-                double currentVelocity = MathFunctions.dotProduct(follower.getVelocity(), heading);
+                double currentVelocity = follower.getVelocity().dot(heading);
                 accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
@@ -663,14 +664,14 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
         Vector heading = new Vector(1.0, follower.getPose().getHeading() - Math.PI / 2);
         if (!end) {
             if (!stopping) {
-                if (MathFunctions.dotProduct(follower.getVelocity(), heading) > VELOCITY) {
-                    previousVelocity = MathFunctions.dotProduct(follower.getVelocity(), heading);
+                if (follower.getVelocity().dot(heading) > VELOCITY) {
+                    previousVelocity = follower.getVelocity().dot(heading);
                     previousTimeNano = System.nanoTime();
                     stopping = true;
                     stopRobot();
                 }
             } else {
-                double currentVelocity = MathFunctions.dotProduct(follower.getVelocity(), heading);
+                double currentVelocity = follower.getVelocity().dot(heading);
                 accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
@@ -756,8 +757,9 @@ class TranslationalTuner extends OpMode {
                 follower.followPath(forwards);
             }
         }
-
-        follower.debug(telemetryM);
+        
+        for (String i : follower.debug())
+            telemetryM.debug(i);
         telemetryM.debug("Push the robot laterally to test the Translational PIDF(s).");
         telemetryM.update(telemetry);
     }
@@ -828,7 +830,8 @@ class HeadingTuner extends OpMode {
             }
         }
 
-        follower.debug(telemetryM);
+        for (String i : follower.debug())
+            telemetryM.debug(i);
         telemetryM.debug("Turn the robot manually to test the Heading PIDF(s).");
         telemetryM.update(telemetry);
     }
@@ -897,7 +900,8 @@ class DriveTuner extends OpMode {
             }
         }
 
-        follower.debug(telemetryM);
+        for (String i : follower.debug())
+            telemetryM.debug(i);
         telemetryM.debug("Driving forward?: " + forward);
         telemetryM.update(telemetry);
     }
@@ -960,7 +964,8 @@ class LineTest extends OpMode {
             }
         }
 
-        follower.debug(telemetryM);
+        for (String i : follower.debug())
+            telemetryM.debug(i);
         telemetryM.debug("Driving Forward?: " + forward);
         telemetryM.update(telemetry);
     }

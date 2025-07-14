@@ -7,6 +7,11 @@ repositories {
     maven { url = "https://mymaven.bylazar.com/releases" }
 }
 
+configurations.configureEach {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+
 dependencies {
     implementation 'org.firstinspires.ftc:Inspection:10.3.0'
     implementation 'org.firstinspires.ftc:Blocks:10.3.0'
@@ -17,7 +22,10 @@ dependencies {
     implementation 'org.firstinspires.ftc:FtcCommon:10.3.0'
     implementation 'org.firstinspires.ftc:Vision:10.3.0'
 
-    implementation 'com.pedropathing:dev:1.1.0-dev18'
+    implementation('com.pedropathing:ftc:1.1.0-SNAPSHOT') {
+        changing = true
+    }
+
     implementation 'com.pedropathing:telemetry:0.0.6'
     implementation 'com.bylazar:ftcontrol:0.6.8'
 
