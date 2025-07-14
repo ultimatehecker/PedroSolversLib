@@ -83,6 +83,7 @@ public class RobotController extends CommandOpMode {
 
         drivetrain.setDefaultCommand(new DrivetrainController(
                 drivetrain,
+                vision,
                 driverController::getLeftY,
                 driverController::getLeftX,
                 driverController::getRightX

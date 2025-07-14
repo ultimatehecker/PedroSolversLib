@@ -8,7 +8,7 @@ repositories {
 }
 
 configurations.configureEach {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    resolutionStrategy.cacheChangingModulesFor 5, 'minutes'
 }
 
 
