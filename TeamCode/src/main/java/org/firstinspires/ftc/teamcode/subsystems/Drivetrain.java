@@ -8,9 +8,9 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.localization.Localizer;
-import com.pedropathing.util.DashboardPoseTracker;
+import com.pedropathing.ftc.Drawing;
+import com.pedropathing.util.PoseHistory;
 
-import com.pedropathing.util.Drawing;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -50,7 +50,7 @@ public class Drivetrain extends SubsystemBase {
     private Telemetry telemetry;
 
     @IgnoreConfigurable
-    static DashboardPoseTracker dashboardPoseTracker;
+    static PoseHistory poseHistory;
 
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
@@ -77,7 +77,7 @@ public class Drivetrain extends SubsystemBase {
         rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         follower = Constants.createFollower(aHardwareMap);
-        dashboardPoseTracker = follower.getDashboardPoseTracker();
+        poseHistory = follower.getPoseHistory();
         telemetryManager = Panels.getTelemetry();
         this.telemetry = telemetry;
 
@@ -159,12 +159,12 @@ public class Drivetrain extends SubsystemBase {
 
     /* Draw on init_loop if planning to use */
     public void drawCurrentTrajectory() {
-        Drawing.drawRobot(follower.getPose());
+        Drawing.drawRobot(getPose().getAsPedroPose());
         Drawing.sendPacket();
     }
 
     public void drawCurrentAndHistoricalTrajectory() {
-        Drawing.drawPoseHistory(dashboardPoseTracker);
+        Drawing.drawPoseHistory(poseHistory);
         drawCurrentTrajectory();
     }
 

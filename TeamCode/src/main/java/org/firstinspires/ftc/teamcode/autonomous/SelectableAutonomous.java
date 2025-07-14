@@ -19,8 +19,9 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.telemetry.SelectableOpMode;
-import com.pedropathing.util.DashboardPoseTracker;
-import com.pedropathing.util.Drawing;
+import com.pedropathing.util.PoseHistory;
+import com.pedropathing.ftc.Drawing;
+import com.pedropathing.util.PoseHistory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -132,6 +133,8 @@ class FourBucketAutonomousNoPark extends CommandOpMode {
             manipulator.onInit();
             elevator.onInit();
             intake.onInit();
+
+            drawCurrent();
         }
 
         waitForStart();
