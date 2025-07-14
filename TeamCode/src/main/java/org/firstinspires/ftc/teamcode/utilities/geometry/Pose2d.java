@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities.geometry;
 
+import com.pedropathing.geometry.Pose;
+
 import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.utilities.geometry.Transform2d;
 import org.firstinspires.ftc.teamcode.utilities.geometry.Translation2d;
@@ -228,5 +230,9 @@ public class Pose2d {
 
     public double getHeading() {
         return m_rotation.getRadians();
+    }
+
+    public Pose getAsPedroPose() {
+        return new Pose(m_translation.getX(), m_translation.getY());
     }
 }

@@ -28,7 +28,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.utilities.Units;
 import org.firstinspires.ftc.teamcode.utilities.constansts.DrivetrainConstants;
+import org.firstinspires.ftc.teamcode.utilities.geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
 
 import java.util.Collections;
 import java.util.Set;
@@ -131,6 +134,10 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
+    public Pose2d getPose() {
+        return new Pose2d(follower.getPose().getX(), follower.getPose().getY(), Rotation2d.fromDegrees(follower.getPose().getHeading()));
+    }
+
     public void setMovementVectors(double forward, double strafe, double rotation, boolean isRobotCentric) {
         follower.setTeleOpDrive(forward, strafe, rotation, isRobotCentric);
     }
@@ -139,8 +146,9 @@ public class Drivetrain extends SubsystemBase {
         follower.setTeleOpDrive(forward, strafe, rotation, true);
     }
 
-    public void resetPose(Pose pose) {
-        follower.setPose(pose);
+    public void resetPose(Pose2d pose) {
+        Pose pedroPose = new Pose(pose.getX(), pose.getY(), pose.getHeading());
+        follower.setPose(pedroPose);
     }
 
     public void resetIMU() {
