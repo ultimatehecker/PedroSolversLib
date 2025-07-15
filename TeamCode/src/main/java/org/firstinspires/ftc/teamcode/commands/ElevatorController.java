@@ -27,15 +27,10 @@ public class ElevatorController extends CommandBase {
     @Override
     public void execute() {
         elevator.toPosition();
-
-        if(elevator.isReached()) {
-            tryingToFinish = true;
-            elevator.elevatorTimer.resetTimer();
-        }
     }
 
     @Override
     public boolean isFinished() {
-        return elevator.elevatorTimer.getElapsedTimeSeconds() > 0.1 && tryingToFinish;
+        return elevator.isReached();
     }
 }

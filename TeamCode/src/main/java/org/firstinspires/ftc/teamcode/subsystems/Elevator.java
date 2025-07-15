@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
@@ -54,7 +55,7 @@ public class Elevator extends SubsystemBase {
     private boolean elevatorRetracted;
 
     private Telemetry telemetry;
-    public Timer elevatorTimer;
+    public ElapsedTime elevatorTimer;
 
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
@@ -80,7 +81,8 @@ public class Elevator extends SubsystemBase {
         elevatorEncoder.reset();
 
         telemetryManager = Panels.getTelemetry();
-        elevatorTimer = new Timer();
+        elevatorTimer = new ElapsedTime();
+        elevatorTimer.seconds();
         this.telemetry = telemetry;
     }
 
@@ -147,10 +149,13 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean isReached() {
+        /*
         return elevatorReached = elevatorController.atSetPoint() && (getCorrectedVelocity() < 1)
                 || (target == 0 && getPosition() < 15 && isHomingSwitchTriggered())
                 || (getPosition() >= target && (target == ElevatorConstants.highBucketHeight || target == ElevatorConstants.lowBucketHeight))
                 || (target == ElevatorConstants.transferHeight + 50 && getPosition() > ElevatorConstants.transferHeight && getPosition() < ElevatorConstants.transferHeight + 65);
+         */
+         return elevatorReached = elevatorController.atSetPoint() && getCorrectedVelocity() < 1;
     }
 
     public boolean isRetracted() {
@@ -167,6 +172,8 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         telemetryManager.graph("Elevator Position", getPosition());
         telemetryManager.graph("Elevator Target", target);
+        telemetryManager.debug("Elevator Timer: ", elevatorTimer.time());
+        telemetryManager.debug("PID is there: " + elevatorController.atSetPoint());
         telemetryManager.debug("Elevator Position: " + getPosition());
         telemetryManager.debug("Elevator Velocity: " + getCorrectedVelocity());
         telemetryManager.debug("Elevator Target: " + target);
