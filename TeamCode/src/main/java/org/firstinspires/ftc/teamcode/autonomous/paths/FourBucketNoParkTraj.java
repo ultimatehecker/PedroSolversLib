@@ -8,8 +8,7 @@ import com.pedropathing.paths.PathChain;
 import org.firstinspires.ftc.teamcode.utilities.constansts.DrivetrainConstants;
 
 public class FourBucketNoParkTraj {
-    public static void path() {
-        /*
+    public static PathChain path() {
         PathBuilder builder = new PathBuilder();
 
         builder
@@ -85,7 +84,5 @@ public class FourBucketNoParkTraj {
                 .setConstantHeadingInterpolation(Math.toRadians(0));
 
         return builder.build();
-
-         */
     }
 }

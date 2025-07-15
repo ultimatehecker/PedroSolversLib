@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import android.util.Size;
+
 import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
@@ -57,7 +59,8 @@ public class Vision extends SubsystemBase {
 
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCamera(aHardwareMap.get(WebcamName.class, "apriltag"));
-        builder.addProcessor(arducam);
+        builder.setCameraResolution(new Size(1280, 720));
+        builder.setStreamFormat(VisionPortal.StreamFormat.MJPEG);
 
         visionPortal = builder.build();
 
@@ -89,18 +92,18 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        computeCameraToSample();
+        //computeCameraToSample();
 
-        List<AprilTagDetection> currentDetections = arducam.getDetections();
-        telemetryManager.debug("# AprilTags Detected: " + currentDetections.size());
+        //List<AprilTagDetection> currentDetections = arducam.getDetections();
+        //telemetryManager.debug("# AprilTags Detected: " + currentDetections.size());
 
-        telemetryManager.debug("LL Target X: " + limelightToTarget.getX());
-        telemetryManager.debug("LL Target Y: " + limelightToTarget.getY());
-        telemetryManager.debug("LL Target θ: " + limelightToTarget.getRotation());
-        telemetryManager.debug("LL Target d: " + distance);
+        //telemetryManager.debug("LL Target X: " + limelightToTarget.getX());
+        //telemetryManager.debug("LL Target Y: " + limelightToTarget.getY());
+        //telemetryManager.debug("LL Target θ: " + limelightToTarget.getRotation());
+        //telemetryManager.debug("LL Target d: " + distance);
 
-        telemetryManager.debug("LL FCoords X: " + limelightFieldCoordinates.getX());
-        telemetryManager.debug("LL FCoords Y: " + limelightFieldCoordinates.getY());
-        telemetryManager.debug("LL FCoords θ: " + limelightFieldCoordinates.getRotation());
+        //telemetryManager.debug("LL FCoords X: " + limelightFieldCoordinates.getX());
+        //telemetryManager.debug("LL FCoords Y: " + limelightFieldCoordinates.getY());
+        //telemetryManager.debug("LL FCoords θ: " + limelightFieldCoordinates.getRotation());
     }
 }

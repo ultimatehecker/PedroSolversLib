@@ -21,7 +21,7 @@ public class DrivetrainController extends CommandBase {
         this.strafe = strafe;
         this.rotation = rotation;
 
-        addRequirements(drivetrain);
+        addRequirements(drivetrain, vision);
     }
 
     @Override
