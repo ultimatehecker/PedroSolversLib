@@ -11,12 +11,16 @@ import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
+import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
 import org.firstinspires.ftc.teamcode.commands.DrivetrainController;
+import org.firstinspires.ftc.teamcode.commands.group.PrepareIntake;
 import org.firstinspires.ftc.teamcode.commands.group.PrepareSample;
 import org.firstinspires.ftc.teamcode.commands.group.PrepareSpeciman;
+import org.firstinspires.ftc.teamcode.commands.group.RetractIntakeAndTransfer;
 import org.firstinspires.ftc.teamcode.commands.group.ScoreSampleThenRetract;
 import org.firstinspires.ftc.teamcode.commands.group.ScoreSpecimanThenRetract;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
@@ -41,6 +45,11 @@ public class RobotController extends CommandOpMode {
     private GamepadButton prepareSpeciman;
     private GamepadButton scoreSpeciman;
     private GamepadButton toggleSpecimanSample;
+    private GamepadButton prepareIntake;
+    private GamepadButton pickSample;
+    private GamepadButton retractAndTransfer;
+    private GamepadButton intakeClaw;
+    private GamepadButton manuipulatorClaw;
 
     private TelemetryManager telemetryManager;
 
@@ -52,12 +61,22 @@ public class RobotController extends CommandOpMode {
         intake = new Intake(hardwareMap, telemetry);
         vision = new Vision(hardwareMap, telemetry);
 
+        intake.onInit();
+        elevator.onInit();
+        manipulator.onInit();
+
         driverController = new GamepadEx(gamepad1);
         operatorController = new GamepadEx(gamepad2);
 
         prepareSpeciman = new GamepadButton(driverController, GamepadKeys.Button.LEFT_BUMPER);
         scoreSpeciman = new GamepadButton(driverController, GamepadKeys.Button.RIGHT_BUMPER);
         toggleSpecimanSample = new GamepadButton(driverController, GamepadKeys.Button.DPAD_LEFT);
+        prepareIntake = new GamepadButton(driverController, GamepadKeys.Button.SQUARE);
+        pickSample = new GamepadButton(driverController, GamepadKeys.Button.RIGHT_STICK_BUTTON);
+        retractAndTransfer = new GamepadButton(driverController, GamepadKeys.Button.TRIANGLE);
+
+        intakeClaw = new GamepadButton(operatorController, GamepadKeys.Button.CROSS);
+        manuipulatorClaw = new GamepadButton(operatorController, GamepadKeys.Button.TRIANGLE);
 
         telemetryManager = Panels.getTelemetry();
 
@@ -69,17 +88,21 @@ public class RobotController extends CommandOpMode {
                 new InstantCommand(() -> sampleSpecimanState = Manipulator.SampleSpecimanState.SPEC)
         );
 
-       prepareSpeciman.whenPressed(new ConditionalCommand(
+        prepareSpeciman.whenPressed(new ConditionalCommand(
                new PrepareSpeciman(manipulator, elevator),
                new PrepareSample(manipulator, elevator),
                () -> sampleSpecimanState == Manipulator.SampleSpecimanState.SPEC
         ));
 
-       scoreSpeciman.whenPressed(new ConditionalCommand(
+
+        scoreSpeciman.whenPressed(new ConditionalCommand(
                 new ScoreSpecimanThenRetract(manipulator, elevator),
                 new ScoreSampleThenRetract(manipulator, elevator),
                 () -> sampleSpecimanState == Manipulator.SampleSpecimanState.SPEC
-       ));
+        ));
+
+        prepareIntake.whenPressed(new PrepareIntake(intake, elevator));
+        retractAndTransfer.whenPressed(new RetractIntakeAndTransfer(elevator, intake, manipulator));
 
         drivetrain.setDefaultCommand(new DrivetrainController(
                 drivetrain,
@@ -96,12 +119,9 @@ public class RobotController extends CommandOpMode {
 
         while (!opModeIsActive()) {
             drivetrain.drawCurrentTrajectory();
-            elevator.onInit();
-            manipulator.onInit();
         }
 
         waitForStart();
-        intake.onInit();
 
         // run the scheduler
         while (!isStopRequested() && opModeIsActive()) {
