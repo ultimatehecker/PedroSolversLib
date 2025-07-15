@@ -48,22 +48,23 @@ public class Intake extends SubsystemBase {
     static TelemetryManager telemetryManager;
 
     public Intake(HardwareMap aHardwareMap, Telemetry telemetry) {
+        intakeState = IntakeState.STORED;
+        wristState = WristState.NORMAL;
+
         leftLinkageServo = new SolversServo(aHardwareMap.get(Servo.class, "linkageServo"), 0.01);
         rightLinkageServo = new SolversServo(aHardwareMap.get(Servo.class, "linkageServo2"), 0.01);
         leftArmServo = new SolversServo(aHardwareMap.get(Servo.class, "leftPivotingServo"), 0.01);
         rightArmServo = new SolversServo(aHardwareMap.get(Servo.class, "rightPivotingServo"), 0.01);
-        wristServo = new SolversServo(aHardwareMap.get(Servo.class, "intakeArm"), 0.01);
+        wristServo = new SolversServo(aHardwareMap.get(Servo.class, "intakeArm"), 0.001);
         clawServo = new SolversServo(aHardwareMap.get(Servo.class, "intakeClaw"), 0.01);
 
         leftLinkageServo.setDirection(Servo.Direction.FORWARD);
         rightLinkageServo.setDirection(Servo.Direction.REVERSE);
         leftArmServo.setDirection(Servo.Direction.REVERSE);
-        rightArmServo.setDirection(Servo.Direction.REVERSE);
+        rightArmServo.setDirection(Servo.Direction.FORWARD);
         wristServo.setDirection(Servo.Direction.FORWARD);
         clawServo.setDirection(Servo.Direction.FORWARD);
 
-        intakeState = IntakeState.STORED;
-        wristState = WristState.NORMAL;
         isClawOpen = true;
 
         intakeTimer = new Timer();
@@ -71,53 +72,79 @@ public class Intake extends SubsystemBase {
         telemetryManager = Panels.getTelemetry();
     }
 
+    public WristState getWristState() {
+        return wristState;
+    }
+
+    public IntakeState getIntakeState() {
+        return intakeState;
+    }
+
+    public double getLinkagePosition() {
+        return leftLinkageServo.getPosition();
+    }
+
+    public double getArmPosition() {
+        return leftArmServo.getPosition();
+    }
+
     public void setIntakeState(IntakeState intakeState) {
+        this.intakeState = intakeState;
+
         switch(intakeState) {
             case STORED:
                 leftLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 rightLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 leftArmServo.setPosition(IntakeConstants.intakeArmStorePosition);
                 rightArmServo.setPosition(IntakeConstants.intakeArmStorePosition);
+                break;
             case TRANSFER:
                 leftLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 rightLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 leftArmServo.setPosition(IntakeConstants.intakeArmTransferPosition);
                 rightArmServo.setPosition(IntakeConstants.intakeArmTransferPosition);
+                break;
             case HOVER_OUT:
                 leftLinkageServo.setPosition(IntakeConstants.intakeLinkageServoOutPosition);
                 rightLinkageServo.setPosition(IntakeConstants.intakeLinkageServoOutPosition);
                 leftArmServo.setPosition(IntakeConstants.intakeArmReadyPosition);
                 rightArmServo.setPosition(IntakeConstants.intakeArmReadyPosition);
+                break;
             case HOVER_IN:
                 leftLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 rightLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 leftArmServo.setPosition(IntakeConstants.intakeArmReadyPosition);
                 rightArmServo.setPosition(IntakeConstants.intakeArmReadyPosition);
+                break;
             case INTAKING_IN:
                 leftLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 rightLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 leftArmServo.setPosition(IntakeConstants.intakeArmIntakingPosition);
                 rightArmServo.setPosition(IntakeConstants.intakeArmIntakingPosition);
+                break;
             case INTAKING_OUT:
                 leftLinkageServo.setPosition(IntakeConstants.intakeLinkageServoOutPosition);
                 rightLinkageServo.setPosition(IntakeConstants.intakeLinkageServoOutPosition);
                 leftArmServo.setPosition(IntakeConstants.intakeArmIntakingPosition);
                 rightArmServo.setPosition(IntakeConstants.intakeArmIntakingPosition);
+                break;
         }
-
-        this.intakeState = intakeState;
     }
 
     public void setWristState(WristState wristState) {
         switch(wristState) {
             case NORMAL:
                 wristServo.setPosition(IntakeConstants.intakeWristRegularPosition);
+                break;
             case DEG30:
                 wristServo.setPosition(IntakeConstants.intakeWristAngled30Position);
+                break;
             case DEG60:
                 wristServo.setPosition(IntakeConstants.intakeWristAngled60Position);
+                break;
             case DEG90:
                 wristServo.setPosition(IntakeConstants.intakeWristAngled90Position);
+                break;
         }
 
         this.wristState = wristState;
@@ -140,11 +167,15 @@ public class Intake extends SubsystemBase {
     public void onInit() {
         setIntakeState(IntakeState.STORED);
         setWristState(WristState.NORMAL);
-        setClawOpen(true);
+        setClawOpen(false);
     }
 
     @Override
     public void periodic() {
-
+        telemetryManager.debug("Wrist Position: " + wristServo.getPosition());
+        telemetryManager.debug("Linkage Position: " + getLinkagePosition());
+        telemetryManager.debug("Wrist State: " + wristState);
+        telemetryManager.debug("Intake State: " + intakeState);
+        telemetryManager.debug("Intake Claw Open: " + isClawOpen());
     }
 }
