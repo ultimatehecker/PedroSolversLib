@@ -10,8 +10,8 @@ public class IntakeConstants {
 
     public static final double intakeArmStorePosition = 0.15;
     public static final double intakeArmTransferPosition = 0.15;
-    public static final double intakeArmReadyPosition = 0.65;
-    public static final double intakeArmIntakingPosition = 0.82;
+    public static final double intakeArmReadyPosition = 0.7;
+    public static final double intakeArmIntakingPosition = 0.87;
 
     public static double intakeLinkageServoInPosition = 0.7;
     public static double intakeLinkageServoOutPosition = 1.0;
