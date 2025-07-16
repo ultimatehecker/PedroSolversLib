@@ -88,10 +88,10 @@ public class Intake extends SubsystemBase {
         return leftArmServo.getPosition();
     }
 
-    public void setIntakeState(IntakeState intakeState) {
-        this.intakeState = intakeState;
+    public void setIntakeState(IntakeState state) {
+        this.intakeState = state;
 
-        switch(intakeState) {
+        switch(state) {
             case STORED:
                 leftLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
                 rightLinkageServo.setPosition(IntakeConstants.intakeLinkageServoInPosition);
@@ -131,8 +131,10 @@ public class Intake extends SubsystemBase {
         }
     }
 
-    public void setWristState(WristState wristState) {
-        switch(wristState) {
+    public void setWristState(WristState state) {
+        this.wristState = state;
+
+        switch(state) {
             case NORMAL:
                 wristServo.setPosition(IntakeConstants.intakeWristRegularPosition);
                 break;
@@ -146,8 +148,6 @@ public class Intake extends SubsystemBase {
                 wristServo.setPosition(IntakeConstants.intakeWristAngled90Position);
                 break;
         }
-
-        this.wristState = wristState;
     }
 
     public void setClawOpen(boolean open) {

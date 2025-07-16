@@ -47,7 +47,7 @@ public class Elevator extends SubsystemBase {
 
     private final PIDFController elevatorController = new PIDFController(ElevatorConstants.P, ElevatorConstants.I, ElevatorConstants.D, ElevatorConstants.F);
 
-    private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.1, 0.15, 0.0, 0.0);
+    private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.105, 0.165, 0.0, 0.0);
     public ElevatorState elevatorState;
 
     private double target;
@@ -137,8 +137,9 @@ public class Elevator extends SubsystemBase {
             power -= 0.1;
         }
 
-        if (isRetracted()) {
+        if (isRetracted() && isHomingSwitchTriggered()) {
             elevatorMotor.setPower(0);
+            elevatorEncoder.reset();
         } else {
             elevatorMotor.setPower(power + elevatorFeedforward.calculate(getCorrectedVelocity()));
         }
@@ -155,11 +156,11 @@ public class Elevator extends SubsystemBase {
                 || (getPosition() >= target && (target == ElevatorConstants.highBucketHeight || target == ElevatorConstants.lowBucketHeight))
                 || (target == ElevatorConstants.transferHeight + 50 && getPosition() > ElevatorConstants.transferHeight && getPosition() < ElevatorConstants.transferHeight + 65);
          */
-         return elevatorReached = elevatorController.atSetPoint() && getCorrectedVelocity() < 1;
+         return elevatorReached = elevatorController.atSetPoint() && getCorrectedVelocity() == 0;
     }
 
     public boolean isRetracted() {
-        return elevatorRetracted = (target <= 0) && elevatorReached;
+        return elevatorRetracted = (target <= 0) && elevatorReached && getCorrectedVelocity() == 0;
     }
 
     public void onInit() {
@@ -172,7 +173,7 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         telemetryManager.graph("Elevator Position", getPosition());
         telemetryManager.graph("Elevator Target", target);
-        telemetryManager.debug("Elevator Timer: ", elevatorTimer.time());
+        telemetryManager.debug("Elevator Timer: " + elevatorTimer.time());
         telemetryManager.debug("PID is there: " + elevatorController.atSetPoint());
         telemetryManager.debug("Elevator Position: " + getPosition());
         telemetryManager.debug("Elevator Velocity: " + getCorrectedVelocity());
@@ -180,5 +181,7 @@ public class Elevator extends SubsystemBase {
         telemetryManager.debug("Elevator Reached: " + isReached());
         telemetryManager.debug("Elevator Retracted: " + isRetracted());
         telemetryManager.debug("Elevator Homing Sensor: " + isHomingSwitchTriggered());
+        telemetryManager.debug("Elevator Power: " + elevatorMotor.getPower());
+        telemetryManager.debug("Feedforward Output: " + elevatorFeedforward.calculate(getCorrectedVelocity()));
     }
 }

@@ -14,7 +14,7 @@ public class PrepareSample extends ParallelCommandGroup {
         setName("Prepare Sample");
         addCommands(
                 new ElevatorController(elevator, Elevator.ElevatorState.SAMPLE_HIGH_SCORE),
-                new WaitCommand(1500).andThen(new ManipulatorController(manipulator, Manipulator.ManipulatorState.SAMPLE_SCORE, false))
+                new WaitCommand(1000).andThen(new ManipulatorController(manipulator, Manipulator.ManipulatorState.SAMPLE_SCORE, false))
         );
     }
 }

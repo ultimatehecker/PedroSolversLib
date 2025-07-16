@@ -59,7 +59,7 @@ public class ElevatorFeedforward extends OpMode {
             telemetryManager.debug("Press the start button to bring up the controls");
             telemetryManager.update(telemetry);
 
-            if(gamepad1.square) {
+            if(gamepad1.start) {
                 startButtonPressed = true;
             }
         }

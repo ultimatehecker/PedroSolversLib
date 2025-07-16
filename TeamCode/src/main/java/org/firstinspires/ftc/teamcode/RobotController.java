@@ -4,19 +4,17 @@ import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
-import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
 import org.firstinspires.ftc.teamcode.commands.DrivetrainController;
+import org.firstinspires.ftc.teamcode.commands.group.PickSample;
 import org.firstinspires.ftc.teamcode.commands.group.PrepareIntake;
 import org.firstinspires.ftc.teamcode.commands.group.PrepareSample;
 import org.firstinspires.ftc.teamcode.commands.group.PrepareSpeciman;
@@ -72,7 +70,7 @@ public class RobotController extends CommandOpMode {
         scoreSpeciman = new GamepadButton(driverController, GamepadKeys.Button.RIGHT_BUMPER);
         toggleSpecimanSample = new GamepadButton(driverController, GamepadKeys.Button.DPAD_LEFT);
         prepareIntake = new GamepadButton(driverController, GamepadKeys.Button.SQUARE);
-        pickSample = new GamepadButton(driverController, GamepadKeys.Button.RIGHT_STICK_BUTTON);
+        pickSample = new GamepadButton(driverController, GamepadKeys.Button.A);
         retractAndTransfer = new GamepadButton(driverController, GamepadKeys.Button.TRIANGLE);
 
         intakeClaw = new GamepadButton(operatorController, GamepadKeys.Button.CROSS);
@@ -81,7 +79,6 @@ public class RobotController extends CommandOpMode {
         telemetryManager = Panels.getTelemetry();
 
         register(drivetrain, elevator, manipulator, intake, vision);
-        schedule(new RunCommand(() -> telemetryManager.update(telemetry)));
 
         toggleSpecimanSample.toggleWhenActive(
                 new InstantCommand(() -> sampleSpecimanState = Manipulator.SampleSpecimanState.SAMP),
@@ -102,6 +99,7 @@ public class RobotController extends CommandOpMode {
         ));
 
         prepareIntake.whenPressed(new PrepareIntake(intake, elevator));
+        pickSample.whenPressed(new PickSample(intake));
         retractAndTransfer.whenPressed(new RetractIntakeAndTransfer(elevator, intake, manipulator));
 
         drivetrain.setDefaultCommand(new DrivetrainController(
@@ -114,21 +112,22 @@ public class RobotController extends CommandOpMode {
     }
 
     @Override
-    public void runOpMode() {
-        initialize();
+    public void initialize_loop() {
+        drivetrain.drawCurrentTrajectory();
+    }
 
-        while (!opModeIsActive()) {
-            drivetrain.drawCurrentTrajectory();
-        }
+    @Override
+    public void run() {
+        CommandScheduler.getInstance().run();
+        telemetryManager.debug("Game Piece: " + sampleSpecimanState.toString());
+        telemetryManager.update(telemetry);
 
-        waitForStart();
+        CommandScheduler.getInstance().onCommandInitialize(command -> {
+            telemetryManager.debug("Command Initialized: " + command.getName());
+        });
 
-        // run the scheduler
-        while (!isStopRequested() && opModeIsActive()) {
-            run();
-            telemetryManager.debug("Game Piece: " + sampleSpecimanState.toString());
-        }
-
-        reset();
+        CommandScheduler.getInstance().onCommandFinish(command -> {
+            telemetryManager.debug("Command Finished: " + command.getName());
+        });
     }
 }

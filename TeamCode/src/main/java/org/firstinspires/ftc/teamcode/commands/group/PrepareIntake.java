@@ -20,7 +20,7 @@ public class PrepareIntake extends SequentialCommandGroup {
                 new ConditionalCommand(
                         new ElevatorController(elevator, Elevator.ElevatorState.TRANSFER),
                         new WaitUntilCommand(() -> true),
-                        () -> elevator.getPosition() < ElevatorConstants.transferHeight
+                        () -> elevator.getPosition() < ElevatorConstants.transferHeight || elevator.getCorrectedVelocity() < 0 || elevator.isRetracted()
                 ),
                 new IntakeController(intake, Intake.IntakeState.HOVER_OUT, Intake.WristState.NORMAL, true)
         );

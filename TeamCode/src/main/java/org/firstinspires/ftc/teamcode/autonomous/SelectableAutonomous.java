@@ -22,6 +22,7 @@ import com.pedropathing.telemetry.SelectableOpMode;
 import com.pedropathing.util.PoseHistory;
 import com.pedropathing.ftc.Drawing;
 import com.pedropathing.util.PoseHistory;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -36,14 +37,15 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Manipulator;
+import org.firstinspires.ftc.teamcode.utilities.SelectableAutonomousMode;
 import org.firstinspires.ftc.teamcode.utilities.constansts.DrivetrainConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Configurable
-@TeleOp(name = "Autonomous", group = "Auto")
-public class SelectableAutonomous extends SelectableOpMode {
+@Autonomous(name = "Autonomous", group = "Auto")
+public class SelectableAutonomous extends SelectableAutonomousMode {
     public static Drivetrain drivetrain;
     public static Elevator elevator;
     public static Intake intake;
