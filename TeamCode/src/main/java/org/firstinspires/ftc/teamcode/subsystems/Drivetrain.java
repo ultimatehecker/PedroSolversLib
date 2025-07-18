@@ -12,6 +12,7 @@ import com.pedropathing.ftc.Drawing;
 import com.pedropathing.util.PoseHistory;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -43,6 +44,7 @@ public class Drivetrain extends SubsystemBase {
     private SolversMotor rightRear;
 
     public Follower follower;
+    private GoBildaPinpointDriver pinpoint;
 
     @IgnoreConfigurable
     static PoseHistory poseHistory;
@@ -55,6 +57,8 @@ public class Drivetrain extends SubsystemBase {
         rightFront = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.fRMotorID), 0.01);
         leftRear = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.bLMotorID), 0.01);
         rightRear = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.bRMotorID), 0.01);
+
+        pinpoint = aHardwareMap.get(GoBildaPinpointDriver.class, DrivetrainConstants.pinpointID);
 
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -74,6 +78,8 @@ public class Drivetrain extends SubsystemBase {
         follower = Constants.createFollower(aHardwareMap);
         poseHistory = follower.getPoseHistory();
         this.telemetryManager = telemetryManager;
+
+        pinpoint.recalibrateIMU();
     }
 
     @Override
@@ -90,7 +96,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void setMovementVectors(double forward, double strafe, double rotation) {
-        follower.setTeleOpDrive(forward, strafe, rotation, true);
+        setMovementVectors(forward, strafe, rotation, true);
     }
 
     public void resetPose(Pose2d pose) {

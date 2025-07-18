@@ -11,6 +11,7 @@ public class DrivetrainConstants {
     public static final String bRMotorID = "rightRear";
 
     public static final String imuID = "imu";
+    public static final String pinpointID = "pinpoint";
 
     public static final double trackWidth = 16.0; // in inches
     public static final double wheelBase = 16.0; // in inches
