@@ -53,11 +53,13 @@ public class RobotController extends CommandOpMode {
 
     @Override
     public void initialize() {
-        drivetrain = new Drivetrain(hardwareMap, telemetry);
-        elevator = new Elevator(hardwareMap, telemetry);
-        manipulator = new Manipulator(hardwareMap, telemetry);
-        intake = new Intake(hardwareMap, telemetry);
-        vision = new Vision(hardwareMap, telemetry);
+        telemetryManager = Panels.getTelemetry();
+
+        drivetrain = new Drivetrain(hardwareMap, telemetryManager);
+        elevator = new Elevator(hardwareMap, telemetryManager);
+        manipulator = new Manipulator(hardwareMap, telemetryManager);
+        intake = new Intake(hardwareMap, telemetryManager);
+        vision = new Vision(hardwareMap, telemetryManager);
 
         intake.onInit();
         elevator.onInit();
@@ -75,8 +77,6 @@ public class RobotController extends CommandOpMode {
 
         intakeClaw = new GamepadButton(operatorController, GamepadKeys.Button.CROSS);
         manuipulatorClaw = new GamepadButton(operatorController, GamepadKeys.Button.TRIANGLE);
-
-        telemetryManager = Panels.getTelemetry();
 
         register(drivetrain, elevator, manipulator, intake, vision);
 

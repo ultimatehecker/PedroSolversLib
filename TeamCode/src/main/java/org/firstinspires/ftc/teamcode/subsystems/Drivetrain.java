@@ -42,12 +42,7 @@ public class Drivetrain extends SubsystemBase {
     private SolversMotor leftRear;
     private SolversMotor rightRear;
 
-    private IMU imu;
-    private BNO055IMU oldIMU;
-    private boolean usingNewIMU;
     public Follower follower;
-
-    private Telemetry telemetry;
 
     @IgnoreConfigurable
     static PoseHistory poseHistory;
@@ -55,7 +50,7 @@ public class Drivetrain extends SubsystemBase {
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Drivetrain(HardwareMap aHardwareMap, Telemetry telemetry) {
+    public Drivetrain(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         leftFront = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.fLMotorID), 0.01);
         rightFront = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.fRMotorID), 0.01);
         leftRear = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.bLMotorID), 0.01);
@@ -78,60 +73,12 @@ public class Drivetrain extends SubsystemBase {
 
         follower = Constants.createFollower(aHardwareMap);
         poseHistory = follower.getPoseHistory();
-        telemetryManager = Panels.getTelemetry();
-        this.telemetry = telemetry;
-
-        initializeIMU(aHardwareMap, true);
-    }
-
-    public void initializeIMU(HardwareMap aHardwareMap, boolean isNew) {
-        if(isNew) {
-            imu = aHardwareMap.get(IMU.class, DrivetrainConstants.imuID);
-
-            IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                    RevHubOrientationOnRobot.UsbFacingDirection.UP
-            ));
-
-            usingNewIMU = true;
-            imu.initialize(parameters);
-        } else {
-            oldIMU = aHardwareMap.get(BNO055IMU.class, DrivetrainConstants.imuID);
-
-            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-            parameters.calibrationDataFile = "BNO055IMUCalibration.json";
-
-            usingNewIMU = false;
-            oldIMU.initialize(parameters);
-        }
+        this.telemetryManager = telemetryManager;
     }
 
     @Override
     public void periodic() {
         drawCurrentAndHistoricalTrajectory();
-    }
-
-    public double getYawDegrees(AngleUnit angleUnit) {
-        if(usingNewIMU()) {
-            return imu.getRobotYawPitchRollAngles().getYaw(angleUnit);
-        } else {
-            return oldIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, angleUnit).firstAngle;
-        }
-    }
-    public double getPitchDegrees(AngleUnit angleUnit) {
-        if(usingNewIMU()) {
-            return imu.getRobotYawPitchRollAngles().getPitch(angleUnit);
-        } else {
-            return oldIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, angleUnit).secondAngle;
-        }
-    }
-    public double getRollDegrees(AngleUnit angleUnit) {
-        if(usingNewIMU()) {
-            return imu.getRobotYawPitchRollAngles().getRoll(angleUnit);
-        } else {
-            return oldIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, angleUnit).thirdAngle;
-        }
     }
 
     public Pose2d getPose() {
@@ -151,12 +98,6 @@ public class Drivetrain extends SubsystemBase {
         follower.setPose(pedroPose);
     }
 
-    public void resetIMU() {
-        if(usingNewIMU()) {
-            imu.resetYaw();
-        }
-    }
-
     /* Draw on init_loop if planning to use */
     public void drawCurrentTrajectory() {
         Drawing.drawRobot(getPose().getAsPedroPose());
@@ -166,10 +107,6 @@ public class Drivetrain extends SubsystemBase {
     public void drawCurrentAndHistoricalTrajectory() {
         Drawing.drawPoseHistory(poseHistory);
         drawCurrentTrajectory();
-    }
-
-    public boolean usingNewIMU() {
-        return usingNewIMU;
     }
 
     public void onStart() {

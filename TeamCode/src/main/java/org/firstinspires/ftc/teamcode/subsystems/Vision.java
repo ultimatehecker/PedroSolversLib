@@ -32,7 +32,6 @@ import java.util.List;
 
 public class Vision extends SubsystemBase {
     private Limelight3A limelight;
-    private Telemetry telemetry;
 
     private Pose2d limelightToTarget;
     private Pose2d limelightFieldCoordinates;
@@ -49,7 +48,7 @@ public class Vision extends SubsystemBase {
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Vision(HardwareMap aHardwareMap, Telemetry telemetry) {
+    public Vision(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         limelight = aHardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
 
@@ -67,8 +66,7 @@ public class Vision extends SubsystemBase {
         relativeLimelightOffset = new Transform2d(new Translation2d(), new Rotation2d());
         limelightFieldCoordinates = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
-        telemetryManager = Panels.getTelemetry();
-        this.telemetry = telemetry;
+        this.telemetryManager = telemetryManager;
     }
 
     public void computeCameraToSample() {

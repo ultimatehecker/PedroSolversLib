@@ -54,13 +54,12 @@ public class Elevator extends SubsystemBase {
     private boolean elevatorReached;
     private boolean elevatorRetracted;
 
-    private Telemetry telemetry;
     public ElapsedTime elevatorTimer;
 
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Elevator(HardwareMap aHardwareMap, Telemetry telemetry) {
+    public Elevator(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         //elevatorMotor = new Motor(aHardwareMap, ElevatorConstants.elevatorMotorID, Motor.GoBILDA.RPM_312);
         elevatorMotor = new SolversMotor(aHardwareMap.get(DcMotor.class, ElevatorConstants.elevatorMotorID), 0.01);
         elevatorEncoder = new Motor(aHardwareMap, ElevatorConstants.elevatorMotorID).encoder;
@@ -80,10 +79,9 @@ public class Elevator extends SubsystemBase {
         elevatorMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         elevatorEncoder.reset();
 
-        telemetryManager = Panels.getTelemetry();
+        this.telemetryManager = telemetryManager;
         elevatorTimer = new ElapsedTime();
         elevatorTimer.seconds();
-        this.telemetry = telemetry;
     }
 
     public int getPosition() {

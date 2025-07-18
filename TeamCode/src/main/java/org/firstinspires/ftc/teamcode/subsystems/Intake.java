@@ -37,7 +37,6 @@ public class Intake extends SubsystemBase {
     private SolversServo wristServo;
     private SolversServo clawServo;
 
-    private Telemetry telemetry;
     public Timer intakeTimer;
     private boolean isClawOpen;
 
@@ -47,7 +46,7 @@ public class Intake extends SubsystemBase {
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Intake(HardwareMap aHardwareMap, Telemetry telemetry) {
+    public Intake(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         intakeState = IntakeState.STORED;
         wristState = WristState.NORMAL;
 
@@ -67,9 +66,8 @@ public class Intake extends SubsystemBase {
 
         isClawOpen = true;
 
+        this.telemetryManager = telemetryManager;
         intakeTimer = new Timer();
-        this.telemetry = telemetry;
-        telemetryManager = Panels.getTelemetry();
     }
 
     public WristState getWristState() {

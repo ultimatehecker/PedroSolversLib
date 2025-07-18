@@ -45,13 +45,12 @@ public class Manipulator extends SubsystemBase {
     private boolean isClawOpen;
     private boolean hasSpeciman;
 
-    private Telemetry telemetry;
     public ElapsedTime manipulatorTimer;
 
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Manipulator(HardwareMap aHardwareMap, Telemetry telemetry) {
+    public Manipulator(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         leftArmServo = new SolversServo(aHardwareMap.get(Servo.class, "leftouttakeArm"), 0.01);
         rightArmServo = new SolversServo(aHardwareMap.get(Servo.class, "rightouttakeArm"), 0.01);
         wristServo = new SolversServo(aHardwareMap.get(Servo.class, "outtakeWrist"), 0.01);
@@ -68,9 +67,8 @@ public class Manipulator extends SubsystemBase {
 
         manipulatorState = ManipulatorState.TRANSFER;
 
-        telemetryManager = Panels.getTelemetry();
+        this.telemetryManager = telemetryManager;
         manipulatorTimer = new ElapsedTime();
-        this.telemetry = telemetry;
     }
 
     public ManipulatorState getState() {
