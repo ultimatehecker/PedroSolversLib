@@ -46,7 +46,6 @@ public class Elevator extends SubsystemBase {
     private SolversServo clawServo;
 
     private final PIDFController elevatorController = new PIDFController(ElevatorConstants.P, ElevatorConstants.I, ElevatorConstants.D, ElevatorConstants.F);
-
     private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.105, 0.165, 0.0, 0.0);
     public ElevatorState elevatorState;
 
@@ -59,8 +58,16 @@ public class Elevator extends SubsystemBase {
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Elevator(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
-        //elevatorMotor = new Motor(aHardwareMap, ElevatorConstants.elevatorMotorID, Motor.GoBILDA.RPM_312);
+    private static Elevator instance = null;
+    public static synchronized Elevator getInstance(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+        if(instance == null) {
+            instance = new Elevator(aHardwareMap, telemetryManager);
+        }
+
+        return instance;
+    }
+
+    private Elevator(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         elevatorMotor = new SolversMotor(aHardwareMap.get(DcMotor.class, ElevatorConstants.elevatorMotorID), 0.01);
         elevatorEncoder = new Motor(aHardwareMap, ElevatorConstants.elevatorMotorID).encoder;
         homingSensor = aHardwareMap.get(TouchSensor.class, ElevatorConstants.elevatorLimitSwitchID);

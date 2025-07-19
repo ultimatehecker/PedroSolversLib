@@ -76,10 +76,10 @@ public class SelectableAutonomous extends SelectableAutonomousMode {
     @Override
     public void onSelect() {
         if (drivetrain == null || elevator == null || intake == null || manipulator == null) {
-            drivetrain = new Drivetrain(hardwareMap, telemetry);
-            elevator = new Elevator(hardwareMap, telemetry);
-            intake = new Intake(hardwareMap, telemetry);
-            manipulator = new Manipulator(hardwareMap, telemetry);
+            drivetrain = Drivetrain.getInstance(hardwareMap, telemetryManager);
+            elevator = Elevator.getInstance(hardwareMap, telemetryManager);
+            intake = Intake.getInstance(hardwareMap, telemetryManager);
+            manipulator = Manipulator.getInstance(hardwareMap, telemetryManager);
 
             ConfigurablesManager.INSTANCE.init(hardwareMap.appContext);
         }

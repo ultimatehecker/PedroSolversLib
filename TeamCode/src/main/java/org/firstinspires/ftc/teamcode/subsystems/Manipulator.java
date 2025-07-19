@@ -50,7 +50,16 @@ public class Manipulator extends SubsystemBase {
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Manipulator(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+    private static Manipulator instance = null;
+    public static synchronized Manipulator getInstance(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+        if(instance == null) {
+            instance = new Manipulator(aHardwareMap, telemetryManager);
+        }
+
+        return instance;
+    }
+
+    private Manipulator(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         leftArmServo = new SolversServo(aHardwareMap.get(Servo.class, "leftouttakeArm"), 0.01);
         rightArmServo = new SolversServo(aHardwareMap.get(Servo.class, "rightouttakeArm"), 0.01);
         wristServo = new SolversServo(aHardwareMap.get(Servo.class, "outtakeWrist"), 0.01);

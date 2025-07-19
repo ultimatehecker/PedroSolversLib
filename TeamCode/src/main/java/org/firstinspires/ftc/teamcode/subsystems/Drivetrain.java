@@ -52,7 +52,16 @@ public class Drivetrain extends SubsystemBase {
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Drivetrain(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+    private static Drivetrain instance = null;
+    public static synchronized Drivetrain getInstance(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+        if(instance == null) {
+            instance = new Drivetrain(aHardwareMap, telemetryManager);
+        }
+
+        return instance;
+    }
+
+    private Drivetrain(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         leftFront = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.fLMotorID), 0.01);
         rightFront = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.fRMotorID), 0.01);
         leftRear = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.bLMotorID), 0.01);
@@ -102,6 +111,10 @@ public class Drivetrain extends SubsystemBase {
     public void resetPose(Pose2d pose) {
         Pose pedroPose = new Pose(pose.getX(), pose.getY(), pose.getHeading());
         follower.setPose(pedroPose);
+    }
+
+    public void resetPinpoint() {
+        pinpoint.recalibrateIMU();
     }
 
     /* Draw on init_loop if planning to use */

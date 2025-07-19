@@ -46,7 +46,16 @@ public class Intake extends SubsystemBase {
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Intake(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+    private static Intake instance = null;
+    public static synchronized Intake getInstance(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+        if(instance == null) {
+            instance = new Intake(aHardwareMap, telemetryManager);
+        }
+
+        return instance;
+    }
+
+    private Intake(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         intakeState = IntakeState.STORED;
         wristState = WristState.NORMAL;
 

@@ -48,7 +48,16 @@ public class Vision extends SubsystemBase {
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
-    public Vision(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+    private static Vision instance = null;
+    public static synchronized Vision getInstance(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
+        if(instance == null) {
+            instance = new Vision(aHardwareMap, telemetryManager);
+        }
+
+        return instance;
+    }
+
+    private Vision(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         limelight = aHardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
 

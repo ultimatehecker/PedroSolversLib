@@ -55,12 +55,13 @@ public class RobotController extends CommandOpMode {
     public void initialize() {
         telemetryManager = Panels.getTelemetry();
 
-        drivetrain = new Drivetrain(hardwareMap, telemetryManager);
-        elevator = new Elevator(hardwareMap, telemetryManager);
-        manipulator = new Manipulator(hardwareMap, telemetryManager);
-        intake = new Intake(hardwareMap, telemetryManager);
-        vision = new Vision(hardwareMap, telemetryManager);
+        drivetrain = Drivetrain.getInstance(hardwareMap, telemetryManager);
+        elevator = Elevator.getInstance(hardwareMap, telemetryManager);
+        manipulator = Manipulator.getInstance(hardwareMap, telemetryManager);
+        intake = Intake.getInstance(hardwareMap, telemetryManager);
+        vision = Vision.getInstance(hardwareMap, telemetryManager);
 
+        drivetrain.resetPinpoint();
         intake.onInit();
         elevator.onInit();
         manipulator.onInit();
