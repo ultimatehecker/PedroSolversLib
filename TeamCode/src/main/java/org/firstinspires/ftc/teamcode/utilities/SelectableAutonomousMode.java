@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.utilities;
 
 import com.pedropathing.telemetry.SelectScope;
 import com.pedropathing.telemetry.Selector;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.CommandScheduler;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -26,7 +28,7 @@ public abstract class SelectableAutonomousMode extends CommandOpMode {
             selectedOpMode.gamepad2 = gamepad2;
             selectedOpMode.telemetry = telemetry;
             selectedOpMode.hardwareMap = hardwareMap;
-            selectedOpMode.init();
+            selectedOpMode.initialize();
         });
     }
 
@@ -37,7 +39,7 @@ public abstract class SelectableAutonomousMode extends CommandOpMode {
     }
 
     @Override
-    public void initialize() {
+    public final void initialize() {
     }
 
     @Override
@@ -57,16 +59,26 @@ public abstract class SelectableAutonomousMode extends CommandOpMode {
                 telemetry.addLine(line);
             }
             onLog(lines);
-        } else selectedOpMode.init_loop();
+        } else selectedOpMode.initialize_loop();
     }
 
+    /*
+
     @Override
-    public void run() {
+    public final void start() {
+        if (selectedOpMode == null) throw new RuntimeException("No OpMode selected!");
+        selectedOpMode.start();
+    }
+
+     */
+
+    @Override
+    public final void run() {
         selectedOpMode.run();
     }
 
     @Override
-    public void end() {
+    public final void end() {
         if (selectedOpMode != null) selectedOpMode.end();
     }
 }

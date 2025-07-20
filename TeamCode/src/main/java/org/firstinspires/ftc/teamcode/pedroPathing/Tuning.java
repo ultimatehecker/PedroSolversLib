@@ -14,7 +14,6 @@ import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.Drawing;
-import com.pedropathing.util.PoseHistory;
 import com.pedropathing.geometry.*;
 import com.pedropathing.math.*;
 import com.pedropathing.paths.*;
@@ -395,12 +394,6 @@ class ForwardVelocityTuner extends OpMode {
     }
 }
 
-// 0.21 0.15
-
-// 0.14 0.13
-
-//0.17 0.11
-
 /**
  * This is the StrafeVelocityTuner autonomous follower OpMode. This runs the robot right at max
  * power until it reaches some specified distance. It records the most recent velocities, and on
@@ -764,7 +757,7 @@ class TranslationalTuner extends OpMode {
                 follower.followPath(forwards);
             }
         }
-        
+
         for (String i : follower.debug())
             telemetryM.debug(i);
         telemetryM.debug("Push the robot laterally to test the Translational PIDF(s).");

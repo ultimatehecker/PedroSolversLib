@@ -4,6 +4,7 @@ import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.commands.ElevatorController;
@@ -22,7 +23,9 @@ public class PrepareIntake extends SequentialCommandGroup {
                         new WaitUntilCommand(() -> true),
                         () -> elevator.getPosition() < ElevatorConstants.transferHeight || elevator.getCorrectedVelocity() < 0 || elevator.isRetracted()
                 ),
-                new IntakeController(intake, Intake.IntakeState.HOVER_OUT, Intake.WristState.NORMAL, true)
+                new IntakeController(intake, Intake.IntakeState.HOVER_OUT, Intake.WristState.NORMAL, true),
+                new WaitCommand(700),
+                new ElevatorController(elevator, Elevator.ElevatorState.RETRACTED)
         );
     }
 }

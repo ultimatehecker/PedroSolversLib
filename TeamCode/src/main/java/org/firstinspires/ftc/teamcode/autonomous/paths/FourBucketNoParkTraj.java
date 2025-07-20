@@ -18,7 +18,7 @@ public class FourBucketNoParkTraj {
                                 DrivetrainConstants.allBucketScoringPose.getAsPedroPose()
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(315))
+                .setLinearHeadingInterpolation(DrivetrainConstants.allBucketStartingPose.getHeading(), DrivetrainConstants.allBucketScoringPose.getHeading())
                 .addPath(
                         new BezierLine(
                                 DrivetrainConstants.allBucketScoringPose.getAsPedroPose(),
