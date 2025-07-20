@@ -100,6 +100,10 @@ public class Drivetrain extends SubsystemBase {
         return new Pose2d(follower.getPose().getX(), follower.getPose().getY(), Rotation2d.fromDegrees(follower.getPose().getHeading()));
     }
 
+    public void setStartingPose(Pose2d pose) {
+        follower.setStartingPose(pose.getAsPedroPose());
+    }
+
     public void setMovementVectors(double forward, double strafe, double rotation, boolean isRobotCentric) {
         follower.setTeleOpDrive(forward, strafe, rotation, isRobotCentric);
     }

@@ -17,10 +17,10 @@ public class DrivetrainConstants {
     public static final double wheelBase = 16.0; // in inches
 
     // Starting Poses
-    public static final Pose2d allBucketStartingPose = new Pose2d(wheelBase / 2, 104.000, Rotation2d.fromDegrees(0));
+    public static final Pose2d allBucketStartingPose = new Pose2d(wheelBase / 2, 112.000, Rotation2d.fromDegrees(0));
     public static final Pose2d preloadSpecimanStartingPose = new Pose2d(wheelBase / 2, 64.000, Rotation2d.fromDegrees(0));
     public static final Pose2d nonPreloadSpecimanStartingPose = new Pose2d(wheelBase / 2, 48.000, Rotation2d.fromDegrees(0));
 
     // Scoring Poses
-    public static final Pose2d allBucketScoringPose = new Pose2d(16.500, 125.500, Rotation2d.fromDegrees(315));
+    public static final Pose2d allBucketScoringPose = new Pose2d(13.750, 130.000, Rotation2d.fromDegrees(315));
 }
