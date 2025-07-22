@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
-import com.pedropathing.paths.PathChain;
+import com.pedropathing.pathgen.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
@@ -98,8 +98,6 @@ public class SelectableAutonomous extends CommandOpMode {
             telemetryManager.debug("Starting Pose Y: " + drivetrain.getPose().getY());
             telemetryManager.debug("Starting Pose θ: " + drivetrain.getPose().getRotation().getDegrees());
             telemetryManager.update(telemetry);
-
-            drivetrain.drawCurrentTrajectory();
         }
 
         drivetrain.follower.update();

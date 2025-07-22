@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import com.pedropathing.geometry.BezierPoint;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierPoint;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;

@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.utilities.geometry;
 
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.localization.Pose;
 
 import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.utilities.geometry.Transform2d;

@@ -112,11 +112,6 @@ public class RobotController extends CommandOpMode {
     }
 
     @Override
-    public void initialize_loop() {
-        drivetrain.drawCurrentTrajectory();
-    }
-
-    @Override
     public void run() {
         CommandScheduler.getInstance().run();
         telemetryManager.debug("Game Piece: " + sampleSpecimanState.toString());

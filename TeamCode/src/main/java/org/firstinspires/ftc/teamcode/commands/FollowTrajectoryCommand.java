@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
+import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.PathChain;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;

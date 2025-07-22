@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.commands.autonomous;
 
-import com.pedropathing.paths.PathChain;
+import com.pedropathing.pathgen.PathChain;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 

@@ -6,10 +6,9 @@ import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.localization.Pose;
 import com.pedropathing.localization.Localizer;
-import com.pedropathing.ftc.Drawing;
-import com.pedropathing.util.PoseHistory;
+import com.pedropathing.localization.Pose;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -28,7 +27,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.utilities.Units;
 import org.firstinspires.ftc.teamcode.utilities.constansts.DrivetrainConstants;
 import org.firstinspires.ftc.teamcode.utilities.geometry.Pose2d;
@@ -44,9 +44,6 @@ public class Drivetrain extends SubsystemBase {
     private SolversMotor rightRear;
 
     public Follower follower;
-
-    @IgnoreConfigurable
-    static PoseHistory poseHistory;
 
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
@@ -81,15 +78,12 @@ public class Drivetrain extends SubsystemBase {
         leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
         rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        follower = Constants.createFollower(aHardwareMap);
-        poseHistory = follower.getPoseHistory();
+        follower = new Follower(aHardwareMap, FConstants.class, LConstants.class);
         this.telemetryManager = telemetryManager;
     }
 
     @Override
     public void periodic() {
-        drawCurrentAndHistoricalTrajectory();
-
         telemetryManager.debug("Drivetrain Pose X: " + getPose().getX());
         telemetryManager.debug("Drivetrain Pose Y: " + getPose().getY());
         telemetryManager.debug("Drivetrain Pose θ: " + getPose().getRotation().getDegrees());
@@ -104,7 +98,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void setMovementVectors(double forward, double strafe, double rotation, boolean isRobotCentric) {
-        follower.setTeleOpDrive(forward, strafe, rotation, isRobotCentric);
+        follower.setTeleOpMovementVectors(forward, strafe, rotation, isRobotCentric);
     }
 
     public void setMovementVectors(double forward, double strafe, double rotation) {
@@ -114,17 +108,6 @@ public class Drivetrain extends SubsystemBase {
     public void resetPose(Pose2d pose) {
         Pose pedroPose = new Pose(pose.getX(), pose.getY(), pose.getHeading());
         follower.setPose(pedroPose);
-    }
-
-    /* Draw on init_loop if planning to use */
-    public void drawCurrentTrajectory() {
-        Drawing.drawRobot(getPose().getAsPedroPose());
-        Drawing.sendPacket();
-    }
-
-    public void drawCurrentAndHistoricalTrajectory() {
-        Drawing.drawPoseHistory(poseHistory);
-        drawCurrentTrajectory();
     }
 
     public void onStart() {

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
+import com.pedropathing.pathgen.PathChain;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 
 import org.firstinspires.ftc.teamcode.autonomous.paths.Trajectories;
