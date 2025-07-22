@@ -61,7 +61,6 @@ public class RobotController extends CommandOpMode {
         intake = Intake.getInstance(hardwareMap, telemetryManager);
         vision = Vision.getInstance(hardwareMap, telemetryManager);
 
-        drivetrain.resetPinpoint();
         intake.onInit();
         elevator.onInit();
         manipulator.onInit();
@@ -72,9 +71,9 @@ public class RobotController extends CommandOpMode {
         prepareSpeciman = new GamepadButton(driverController, GamepadKeys.Button.LEFT_BUMPER);
         scoreSpeciman = new GamepadButton(driverController, GamepadKeys.Button.RIGHT_BUMPER);
         toggleSpecimanSample = new GamepadButton(driverController, GamepadKeys.Button.DPAD_LEFT);
-        prepareIntake = new GamepadButton(driverController, GamepadKeys.Button.SQUARE);
+        prepareIntake = new GamepadButton(driverController, GamepadKeys.Button.X);
         pickSample = new GamepadButton(driverController, GamepadKeys.Button.A);
-        retractAndTransfer = new GamepadButton(driverController, GamepadKeys.Button.TRIANGLE);
+        retractAndTransfer = new GamepadButton(driverController, GamepadKeys.Button.Y);
 
         intakeClaw = new GamepadButton(operatorController, GamepadKeys.Button.CROSS);
         manuipulatorClaw = new GamepadButton(operatorController, GamepadKeys.Button.TRIANGLE);

@@ -38,7 +38,6 @@ public class Manipulator extends SubsystemBase {
     private SolversServo wristServo;
     private SolversServo clawServo;
 
-    private RevColorSensorV3 colorSensor;
     private AnalogInput absoluteEncoder;
     private TouchSensor elevatorResetSwitch;
 
@@ -65,7 +64,6 @@ public class Manipulator extends SubsystemBase {
         wristServo = new SolversServo(aHardwareMap.get(Servo.class, "outtakeWrist"), 0.01);
         clawServo = new SolversServo(aHardwareMap.get(Servo.class, "outtakeClaw"), 0.01);
 
-        colorSensor = (RevColorSensorV3) aHardwareMap.colorSensor.get("outtakeColorSensor");
         absoluteEncoder = aHardwareMap.get(AnalogInput.class, "absoluteEncoder");
         elevatorResetSwitch = aHardwareMap.get(TouchSensor.class, "elevatorResetSwitch");
 
@@ -135,15 +133,6 @@ public class Manipulator extends SubsystemBase {
         return isClawOpen;
     }
 
-    /* TODO: Work in Progress (not currently on the robot) */
-    public boolean clawHasSpeciman() {
-        double redValue = colorSensor.red();
-        double greenValue = colorSensor.green();
-        double blueValue = colorSensor.blue();
-
-        return true;
-    }
-
     public void onInit() {
         setPosition(ManipulatorState.TRANSFER);
         setClawOpen(true);
@@ -151,7 +140,9 @@ public class Manipulator extends SubsystemBase {
 
     @Override
     public void periodic() {
+        /*
         telemetryManager.debug("Manipulator State: " + manipulatorState);
         telemetryManager.debug("Manipulator Claw Open: " + isClawOpen());
+         */
     }
 }

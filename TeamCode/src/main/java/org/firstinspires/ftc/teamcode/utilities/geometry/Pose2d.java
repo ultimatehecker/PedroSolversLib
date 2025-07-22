@@ -233,6 +233,6 @@ public class Pose2d {
     }
 
     public Pose getAsPedroPose() {
-        return new Pose(m_translation.getX(), m_translation.getY(), m_rotation.getDegrees());
+        return new Pose(m_translation.getX(), m_translation.getY(), m_rotation.getRadians());
     }
 }

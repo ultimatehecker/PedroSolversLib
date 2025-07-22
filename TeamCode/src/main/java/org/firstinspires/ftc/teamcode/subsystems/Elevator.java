@@ -176,6 +176,7 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
+        /*
         telemetryManager.graph("Elevator Position", getPosition());
         telemetryManager.graph("Elevator Target", target);
         telemetryManager.debug("Elevator Timer: " + elevatorTimer.time());
@@ -188,5 +189,6 @@ public class Elevator extends SubsystemBase {
         telemetryManager.debug("Elevator Homing Sensor: " + isHomingSwitchTriggered());
         telemetryManager.debug("Elevator Power: " + elevatorMotor.getPower());
         telemetryManager.debug("Feedforward Output: " + elevatorFeedforward.calculate(getCorrectedVelocity()));
+         */
     }
 }

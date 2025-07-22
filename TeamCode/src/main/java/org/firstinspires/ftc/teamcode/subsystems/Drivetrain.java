@@ -44,7 +44,6 @@ public class Drivetrain extends SubsystemBase {
     private SolversMotor rightRear;
 
     public Follower follower;
-    private GoBildaPinpointDriver pinpoint;
 
     @IgnoreConfigurable
     static PoseHistory poseHistory;
@@ -67,8 +66,6 @@ public class Drivetrain extends SubsystemBase {
         leftRear = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.bLMotorID), 0.01);
         rightRear = new SolversMotor(aHardwareMap.get(DcMotor.class, DrivetrainConstants.bRMotorID), 0.01);
 
-        pinpoint = aHardwareMap.get(GoBildaPinpointDriver.class, DrivetrainConstants.pinpointID);
-
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -87,17 +84,19 @@ public class Drivetrain extends SubsystemBase {
         follower = Constants.createFollower(aHardwareMap);
         poseHistory = follower.getPoseHistory();
         this.telemetryManager = telemetryManager;
-
-        pinpoint.recalibrateIMU();
     }
 
     @Override
     public void periodic() {
         drawCurrentAndHistoricalTrajectory();
+
+        telemetryManager.debug("Drivetrain Pose X: " + getPose().getX());
+        telemetryManager.debug("Drivetrain Pose Y: " + getPose().getY());
+        telemetryManager.debug("Drivetrain Pose θ: " + getPose().getRotation().getDegrees());
     }
 
     public Pose2d getPose() {
-        return new Pose2d(follower.getPose().getX(), follower.getPose().getY(), Rotation2d.fromDegrees(follower.getPose().getHeading()));
+        return new Pose2d(follower.getPose().getX(), follower.getPose().getY(), new Rotation2d(follower.getPose().getHeading()));
     }
 
     public void setStartingPose(Pose2d pose) {
@@ -115,10 +114,6 @@ public class Drivetrain extends SubsystemBase {
     public void resetPose(Pose2d pose) {
         Pose pedroPose = new Pose(pose.getX(), pose.getY(), pose.getHeading());
         follower.setPose(pedroPose);
-    }
-
-    public void resetPinpoint() {
-        pinpoint.recalibrateIMU();
     }
 
     /* Draw on init_loop if planning to use */

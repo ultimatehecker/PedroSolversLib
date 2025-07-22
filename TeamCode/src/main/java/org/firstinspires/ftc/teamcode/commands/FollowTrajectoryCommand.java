@@ -109,11 +109,6 @@ public class FollowTrajectoryCommand extends CommandBase {
     }
 
     @Override
-    public void execute() {
-        drivetrain.follower.update();
-    }
-
-    @Override
     public boolean isFinished() {
         return !drivetrain.follower.isBusy();
     }

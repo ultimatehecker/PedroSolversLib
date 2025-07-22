@@ -179,10 +179,12 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
+        /*
         telemetryManager.debug("Wrist Position: " + wristServo.getPosition());
         telemetryManager.debug("Linkage Position: " + getLinkagePosition());
         telemetryManager.debug("Wrist State: " + wristState);
         telemetryManager.debug("Intake State: " + intakeState);
         telemetryManager.debug("Intake Claw Open: " + isClawOpen());
+         */
     }
 }

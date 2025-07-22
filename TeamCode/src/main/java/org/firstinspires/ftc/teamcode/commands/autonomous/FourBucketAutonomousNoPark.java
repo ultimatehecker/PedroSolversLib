@@ -22,7 +22,7 @@ public class FourBucketAutonomousNoPark extends SequentialCommandGroup {
         setName("Four Bucket No Park Autonomous");
         addCommands(
                 new WaitUntilCommand(isOpModeActive),
-                new FollowTrajectoryCommand(drivetrain, pathChain.getPath(0)).setCompletionThreshold(0.975)
+                new FollowTrajectoryCommand(drivetrain, pathChain.getPath(0))
         );
     }
 }

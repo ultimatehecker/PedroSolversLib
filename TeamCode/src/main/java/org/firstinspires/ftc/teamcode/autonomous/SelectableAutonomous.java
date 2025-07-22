@@ -60,7 +60,6 @@ public class SelectableAutonomous extends CommandOpMode {
         currentAuto = AutonomousMode.FOUR_BUCKET_NO_PARK;
         AUTONOMOUS_MODES = AutonomousMode.values();
 
-        drivetrain.resetPinpoint();
         intake.onInit();
         elevator.onInit();
         manipulator.onInit();
@@ -75,11 +74,11 @@ public class SelectableAutonomous extends CommandOpMode {
                 previousAuto();
             } else if(gamepad2.a && !aButtonPrevious) {
                 schedule(
+                        new RunCommand(drivetrain.follower::update),
                         currentAuto.getCommand(drivetrain, elevator, intake, (BooleanSupplier) this::opModeIsActive)
                 );
 
                 drivetrain.setStartingPose(currentAuto.getStartingPose());
-                drivetrain.follower.update();
                 autoChoosen = true;
             }
 
@@ -97,9 +96,13 @@ public class SelectableAutonomous extends CommandOpMode {
             telemetryManager.debug("\n");
             telemetryManager.debug("Starting Pose X: " + drivetrain.getPose().getX());
             telemetryManager.debug("Starting Pose Y: " + drivetrain.getPose().getY());
-            telemetryManager.debug("Starting Pose θ: " + drivetrain.getPose().getHeading());
+            telemetryManager.debug("Starting Pose θ: " + drivetrain.getPose().getRotation().getDegrees());
             telemetryManager.update(telemetry);
+
+            drivetrain.drawCurrentTrajectory();
         }
+
+        drivetrain.follower.update();
     }
 
     @Override
