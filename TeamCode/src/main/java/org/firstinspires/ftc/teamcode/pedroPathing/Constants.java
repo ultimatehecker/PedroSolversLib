@@ -11,8 +11,11 @@ import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
+import com.pedropathing.ftc.localization.Encoder;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
+import com.pedropathing.ftc.localization.constants.ThreeWheelConstants;
 import com.pedropathing.ftc.localization.localizers.PinpointLocalizer;
+import com.pedropathing.ftc.localization.localizers.ThreeWheelLocalizer;
 import com.pedropathing.paths.PathConstraints;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -61,13 +64,27 @@ public class Constants {
             .motorCachingThreshold(0.01)
             .useBrakeModeInTeleOp(false);
 
+    public static ThreeWheelConstants threeWheelConstants = new ThreeWheelConstants()
+            .leftEncoder_HardwareMapName(DrivetrainConstants.fLMotorID)
+            .rightEncoder_HardwareMapName(DrivetrainConstants.fRMotorID)
+            .strafeEncoder_HardwareMapName(DrivetrainConstants.fRMotorID)
+            .leftPodY(6.375)
+            .rightPodY(-6.375)
+            .strafePodX(-6.0625)
+            .leftEncoderDirection(Encoder.REVERSE)
+            .rightEncoderDirection(Encoder.FORWARD)
+            .strafeEncoderDirection(Encoder.REVERSE)
+            .forwardTicksToInches(0.003)
+            .strafeTicksToInches(0.003)
+            .turnTicksToInches(0.003);
+
     public static PinpointConstants pinpointConstants = new PinpointConstants()
-            .forwardPodY(-6.375)
+            .forwardPodY(6.375)
             .strafePodX(-6.0625)
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 3, 1);
@@ -75,7 +92,8 @@ public class Constants {
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .setDrivetrain(new Mecanum(hardwareMap, driveConstants))
-                .setLocalizer(new PinpointLocalizer(hardwareMap, pinpointConstants))
+                //.setLocalizer(new PinpointLocalizer(hardwareMap, pinpointConstants))
+                .setLocalizer(new ThreeWheelLocalizer(hardwareMap, threeWheelConstants))
                 .pathConstraints(pathConstraints)
                 .build();
     }
