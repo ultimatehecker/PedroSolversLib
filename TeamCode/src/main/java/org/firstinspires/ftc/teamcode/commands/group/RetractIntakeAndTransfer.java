@@ -33,7 +33,7 @@ public class RetractIntakeAndTransfer extends SequentialCommandGroup {
                         () -> manipulator.getState() != Manipulator.ManipulatorState.TRANSFER
                 ),
                 new ManipulatorController(manipulator, manipulator.getState(), false),
-                new WaitCommand(100).andThen(new IntakeController(intake, intake.getIntakeState(), intake.getWristState(), true))
+                new WaitCommand(50).andThen(new IntakeController(intake, intake.getIntakeState(), intake.getWristState(), true))
         );
     }
 }

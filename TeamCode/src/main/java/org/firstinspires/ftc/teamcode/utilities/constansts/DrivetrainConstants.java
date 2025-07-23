@@ -18,7 +18,7 @@ public class DrivetrainConstants {
 
     // Starting Poses
     public static final Pose2d allBucketStartingPose = new Pose2d(wheelBase / 2, 112.000, Rotation2d.fromDegrees(0));
-    public static final Pose2d preloadSpecimanStartingPose = new Pose2d(wheelBase / 2, 64.000, Rotation2d.fromDegrees(0));
+    public static final Pose2d preloadSpecimanStartingPose = new Pose2d(wheelBase / 2, 68.000, Rotation2d.fromDegrees(0));
     public static final Pose2d nonPreloadSpecimanStartingPose = new Pose2d(wheelBase / 2, 48.000, Rotation2d.fromDegrees(0));
 
     // Scoring Poses

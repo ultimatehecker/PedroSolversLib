@@ -13,7 +13,7 @@ public class ScoreSampleThenRetract extends SequentialCommandGroup {
         setName("Score Speciman Then Retract");
         addCommands(
                 new ManipulatorController(manipulator, manipulator.getState(),  true),
-                new WaitCommand(300),
+                new WaitCommand(500),
                 new ManipulatorController(manipulator, Manipulator.ManipulatorState.TRANSFER, true),
                 new WaitCommand(300),
                 new ElevatorController(elevator, Elevator.ElevatorState.RETRACTED)

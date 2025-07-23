@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
+
 import com.pedropathing.pathgen.PathChain;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
@@ -22,10 +24,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Manipulator;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import static org.firstinspires.ftc.teamcode.utilities.constansts.GlobalConstants.*;
 
 import java.util.function.BooleanSupplier;
 
-@Autonomous(name="Autonomous", group="Pedro Pathing")
+@Autonomous(name="Autonomous", group="Pedro Pathing", preselectTeleOp="RobotController")
 public class SelectableAutonomous extends CommandOpMode {
     private Drivetrain drivetrain;
     private Elevator elevator;
@@ -42,12 +45,15 @@ public class SelectableAutonomous extends CommandOpMode {
     private AutonomousMode currentAuto;
     private static AutonomousMode[] AUTONOMOUS_MODES;
     private int autoIndex = 0;
+    private long lastTime = 0;
 
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
     @Override
     public void initialize() {
+        opModeType = OpModeType.AUTO;
+
         telemetryManager = Panels.getTelemetry();
         drivetrain = Drivetrain.getInstance(hardwareMap, telemetryManager);
         elevator = Elevator.getInstance(hardwareMap, telemetryManager);
@@ -60,6 +66,7 @@ public class SelectableAutonomous extends CommandOpMode {
         currentAuto = AutonomousMode.FOUR_BUCKET_NO_PARK;
         AUTONOMOUS_MODES = AutonomousMode.values();
 
+        drivetrain.follower.breakFollowing();
         intake.onInit();
         elevator.onInit();
         manipulator.onInit();
@@ -75,7 +82,7 @@ public class SelectableAutonomous extends CommandOpMode {
             } else if(gamepad2.a && !aButtonPrevious) {
                 schedule(
                         new RunCommand(drivetrain.follower::update),
-                        currentAuto.getCommand(drivetrain, elevator, intake, (BooleanSupplier) this::opModeIsActive)
+                        currentAuto.getCommand(drivetrain, elevator, manipulator, intake, (BooleanSupplier) this::opModeIsActive)
                 );
 
                 drivetrain.setStartingPose(currentAuto.getStartingPose());
@@ -128,6 +135,11 @@ public class SelectableAutonomous extends CommandOpMode {
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
+        long currentTime = System.nanoTime();
+        double loopTimeMs = (currentTime - lastTime) / 1_000_000.0;
+        lastTime = currentTime;
+
+        telemetryManager.debug("Loop Time (ms): " + loopTimeMs);
         telemetryManager.update(telemetry);
     }
 

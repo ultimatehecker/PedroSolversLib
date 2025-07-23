@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
+
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -26,6 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Manipulator;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import static org.firstinspires.ftc.teamcode.utilities.constansts.GlobalConstants.*;
 
 @TeleOp(name="RobotController")
 public class RobotController extends CommandOpMode {
@@ -50,9 +52,11 @@ public class RobotController extends CommandOpMode {
     private GamepadButton manuipulatorClaw;
 
     private TelemetryManager telemetryManager;
+    private long lastTime = 0;
 
     @Override
     public void initialize() {
+        opModeType = OpModeType.TELEOP;
         telemetryManager = Panels.getTelemetry();
 
         drivetrain = Drivetrain.getInstance(hardwareMap, telemetryManager);
@@ -114,6 +118,12 @@ public class RobotController extends CommandOpMode {
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
+
+        long currentTime = System.nanoTime();
+        double loopTimeMs = (currentTime - lastTime) / 1_000_000.0;
+        lastTime = currentTime;
+
+        telemetryManager.debug("Loop Time (ms): " + loopTimeMs);
         telemetryManager.debug("Game Piece: " + sampleSpecimanState.toString());
         telemetryManager.update(telemetry);
 

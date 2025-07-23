@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous.paths;
 
+import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathBuilder;
@@ -13,76 +14,63 @@ public class FourBucketNoParkTraj {
         PathBuilder builder = new PathBuilder();
 
         builder
-                .addPath(
+                .addPath( // Starting Pose to Scoring Pose
                         new BezierLine(
                                 new Point(8.000, 112.000, Point.CARTESIAN),
                                 new Point(13.750, 130.000, Point.CARTESIAN)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(-45))
-                .addPath(
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(315))
+                .addPath( // Scoring Pose to Pickup Point 1
                         new BezierLine(
                                 new Point(13.750, 130.000, Point.CARTESIAN),
-                                new Point(27.000, 120.000, Point.CARTESIAN)
+                                new Point(24.250, 126.250, Point.CARTESIAN)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addPath(
+                .setLinearHeadingInterpolation(Math.toRadians(315), Math.toRadians(-11.5))
+                .addPath( // Pickup Point 1 to Scoring Pose
                         new BezierLine(
-                                new Point(27.000, 121.000, Point.CARTESIAN),
-                                new Point(6.500, 129.000, Point.CARTESIAN)
+                                new Point(24.250, 126.250, Point.CARTESIAN),
+                                new Point(13.750, 130.000, Point.CARTESIAN)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(315))
-                .addPath(
+                .setLinearHeadingInterpolation(Math.toRadians(-25), Math.toRadians(315))
+                .addPath( // Scoring Pose to Pickup Point 2
                         new BezierLine(
-                                new Point(6.500, 129.000, Point.CARTESIAN),
-                                new Point(27.000, 130.100, Point.CARTESIAN)
+                                new Point(13.750, 130.000, Point.CARTESIAN),
+                                new Point(23.50, 130.500, Point.CARTESIAN)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addPath(
+                .setLinearHeadingInterpolation(Math.toRadians(315), Math.toRadians(0))
+                .addPath( // Pickup Point 2  to Scoring Pose
                         new BezierLine(
-                                new Point(27.000, 130.100, Point.CARTESIAN),
-                                new Point(6.000, 128.000, Point.CARTESIAN)
+                                new Point(23.50, 130.500, Point.CARTESIAN),
+                                new Point(13.750, 130.000, Point.CARTESIAN)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(315))
-                .addPath(
+                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(315))
+                .addPath( // Scoring Pose to Pickup Point 3
                         new BezierLine(
-                                new Point(6.000, 128.000, Point.CARTESIAN),
-                                new Point(37.000, 128.000, Point.CARTESIAN)
+                                new Point(13.750, 130.000, Point.CARTESIAN),
+                                new Point(30.750, 125.250, Point.CARTESIAN)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(90))
-                .addPath(
+                .setLinearHeadingInterpolation(Math.toRadians(315), Math.toRadians(45)) // stop
+                .addPath( // Pickup Point 3 to Scoring Pose
                         new BezierLine(
-                                new Point(37.000, 128.000, Point.CARTESIAN),
-                                new Point(5.500, 128.000, Point.CARTESIAN)
+                                new Point(30.750, 125.250, Point.CARTESIAN),
+                                new Point(13.750, 130.000, Point.CARTESIAN)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(315))
-                .addPath(
-                        new BezierLine(
-                                new Point(5.500, 128.000, Point.CARTESIAN),
-                                new Point(6.000, 106.000, Point.CARTESIAN)
+                .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(315))
+                .addPath( // Scoring Pose to Park
+                        new BezierCurve(
+                                new Point(13.750, 130.000, Point.CARTESIAN),
+                                new Point(61.75, 110.000, Point.CARTESIAN),
+                                new Point(60.000, 100.000, Point.CARTESIAN)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(-90))
-                .addPath(
-                        new BezierLine(
-                                new Point(6.000, 106.000, Point.CARTESIAN),
-                                new Point(5.500, 128.000, Point.CARTESIAN)
-                        )
-                )
-                .setConstantHeadingInterpolation(Math.toRadians(315))
-                .addPath(
-                        new BezierLine(
-                                new Point(5.500, 128.000, Point.CARTESIAN),
-                                new Point(20.000, 120.000, Point.CARTESIAN)
-                        )
-                )
-                .setConstantHeadingInterpolation(Math.toRadians(0));
+                .setTangentHeadingInterpolation();
 
         return builder.build();
     }

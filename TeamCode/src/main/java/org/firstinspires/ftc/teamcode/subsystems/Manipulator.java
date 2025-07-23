@@ -3,17 +3,19 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
+
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.solversHardware.SolversServo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.utilities.constansts.ElevatorConstants;
+import static org.firstinspires.ftc.teamcode.utilities.constansts.GlobalConstants.*;
 import org.firstinspires.ftc.teamcode.utilities.constansts.ManipulatorConstants;
 
 public class Manipulator extends SubsystemBase {
@@ -134,8 +136,13 @@ public class Manipulator extends SubsystemBase {
     }
 
     public void onInit() {
-        setPosition(ManipulatorState.TRANSFER);
-        setClawOpen(true);
+        if(opModeType.equals(OpModeType.AUTO)) {
+            setPosition(ManipulatorState.TRANSFER_CLEARENCE);
+            setClawOpen(false);
+        } else if(opModeType.equals(OpModeType.TELEOP)) {
+            setPosition(ManipulatorState.TRANSFER);
+            setClawOpen(true);
+        }
     }
 
     @Override

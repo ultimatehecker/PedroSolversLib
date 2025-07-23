@@ -155,17 +155,15 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean isReached() {
-        /*
-        return elevatorReached = elevatorController.atSetPoint() && (getCorrectedVelocity() < 1)
-                || (target == 0 && getPosition() < 15 && isHomingSwitchTriggered())
-                || (getPosition() >= target && (target == ElevatorConstants.highBucketHeight || target == ElevatorConstants.lowBucketHeight))
-                || (target == ElevatorConstants.transferHeight + 50 && getPosition() > ElevatorConstants.transferHeight && getPosition() < ElevatorConstants.transferHeight + 65);
-         */
          return elevatorReached = elevatorController.atSetPoint() && getCorrectedVelocity() == 0;
     }
 
     public boolean isRetracted() {
         return elevatorRetracted = (target <= 0) && elevatorReached && getCorrectedVelocity() == 0;
+    }
+
+    public boolean isRetracting() {
+        return getCorrectedVelocity() < -20;
     }
 
     public void onInit() {

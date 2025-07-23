@@ -43,6 +43,8 @@ public class Drivetrain extends SubsystemBase {
     private SolversMotor leftRear;
     private SolversMotor rightRear;
 
+    private IMU imu;
+
     public Follower follower;
 
     @IgnoreConfigurable
@@ -80,6 +82,16 @@ public class Drivetrain extends SubsystemBase {
 
         follower = new Follower(aHardwareMap, FConstants.class, LConstants.class);
         this.telemetryManager = telemetryManager;
+
+        initializeImu(aHardwareMap);
+    }
+
+    public void initializeImu(HardwareMap hardwareMap) {
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP));
+        imu.initialize(parameters);
     }
 
     @Override
@@ -110,7 +122,12 @@ public class Drivetrain extends SubsystemBase {
         follower.setPose(pedroPose);
     }
 
+    public void resetHeading() {
+        imu.resetYaw();
+    }
+
     public void onStart() {
+        resetHeading();
         follower.startTeleopDrive();
         follower.update();
     }
