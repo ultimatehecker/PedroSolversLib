@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.utilities.tuning.sensor;
 
+import com.bylazar.ftcontrol.panels.Panels;
+import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
+import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -16,9 +19,17 @@ public class LimelightLogging extends OpMode {
     private boolean isTargetFound, isLocked;
     private Pose2d targetLocation;
 
+    @IgnoreConfigurable
+    static TelemetryManager telemetryManager;
+
     @Override
     public void init() {
         limelight3A = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight3A.setPollRateHz(100);
+        limelight3A.start();
+        telemetry.setMsTransmissionInterval(11);
+        limelight3A.pipelineSwitch(1);
+        telemetryManager = Panels.getTelemetry();
     }
 
     @Override
@@ -34,21 +45,24 @@ public class LimelightLogging extends OpMode {
     @Override
     public void loop() {
         LLResult llResult = limelight3A.getLatestResult();
+        if(llResult != null) {
+            telemetry.addData("something", limelight3A.getLatestResult().getPythonOutput().length);
+            telemetry.addData("something1", limelight3A.getLatestResult().getTy());
+            telemetry.addData("something2", limelight3A.getLatestResult().getTx());
+            telemetry.addData("something3", limelight3A.getLatestResult().getTa());
+            telemetry.addData("something4", limelight3A.getLatestResult().getTargetingLatency());
+            telemetry.addData("something5", limelight3A.getTimeSinceLastUpdate());
+            telemetry.addData("something6", limelight3A.getLatestResult().getTxNC());
 
-        if(llResult != null && llResult.isValid()) {
-            if(!llResult.getDetectorResults().isEmpty() && !isLocked) {
-                targetLocation = new Pose2d(llResult.getTx(), llResult.getTy(), new Rotation2d());
-                isLocked = true;
+            long staleness = llResult.getStaleness();
+            if (staleness < 100) { // Less than 100 milliseconds old
+                telemetry.addData("Data", "Good");
+            } else {
+                telemetry.addData("Data", "Old (" + staleness + " ms)");
             }
         }
 
-        if(isLocked && targetLocation != null) {
-            PIDFController xController = new PIDFController(0,0,0,0);
-            PIDFController yController = new PIDFController(0,0,0,0);
-        }
-
-        telemetry.addData("Target Locked", isLocked);
-        telemetry.addData("Target X", targetLocation != null ? targetLocation.getX() : "N/A");
-        telemetry.addData("Target Y", targetLocation != null ? targetLocation.getY() : "N/A");
+        telemetry.addData("LLResult Validity: ", limelight3A.getLatestResult().isValid());
+        telemetryManager.update(telemetry);
     }
 }
