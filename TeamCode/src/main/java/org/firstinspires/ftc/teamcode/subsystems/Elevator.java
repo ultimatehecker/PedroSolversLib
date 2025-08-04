@@ -4,8 +4,6 @@ import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 
-import com.pedropathing.util.Timer;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -36,14 +34,9 @@ public class Elevator extends SubsystemBase {
         SAMPLE_HIGH_SCORE
     }
 
-    private SolversMotor elevatorMotor;
-    private Motor.Encoder elevatorEncoder;
-    private TouchSensor homingSensor;
-
-    private SolversServo leftArmServo;
-    private SolversServo rightArmServo;
-    private SolversServo wristServo;
-    private SolversServo clawServo;
+    private final SolversMotor elevatorMotor;
+    private final Motor.Encoder elevatorEncoder;
+    private final TouchSensor homingSensor;
 
     private final PIDFController elevatorController = new PIDFController(ElevatorConstants.P, ElevatorConstants.I, ElevatorConstants.D, ElevatorConstants.F);
     private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(0.105, 0.165, 0.0, 0.0);
@@ -71,16 +64,6 @@ public class Elevator extends SubsystemBase {
         elevatorMotor = new SolversMotor(aHardwareMap.get(DcMotor.class, ElevatorConstants.elevatorMotorID), 0.01);
         elevatorEncoder = new Motor(aHardwareMap, ElevatorConstants.elevatorMotorID).encoder;
         homingSensor = aHardwareMap.get(TouchSensor.class, ElevatorConstants.elevatorLimitSwitchID);
-
-        leftArmServo = new SolversServo(aHardwareMap.get(Servo.class, "leftouttakeArm"), 0.01);
-        rightArmServo = new SolversServo(aHardwareMap.get(Servo.class, "rightouttakeArm"), 0.01);
-        wristServo = new SolversServo(aHardwareMap.get(Servo.class, "outtakeWrist"), 0.01);
-        clawServo = new SolversServo(aHardwareMap.get(Servo.class, "outtakeClaw"), 0.01);
-
-        leftArmServo.setDirection(Servo.Direction.REVERSE);
-        rightArmServo.setDirection(Servo.Direction.REVERSE);
-        wristServo.setDirection(Servo.Direction.FORWARD);
-        clawServo.setDirection(Servo.Direction.REVERSE);
 
         elevatorController.setTolerance(25);
         elevatorMotor.setDirection(DcMotorSimple.Direction.REVERSE);

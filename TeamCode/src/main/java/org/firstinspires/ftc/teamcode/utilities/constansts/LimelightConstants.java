@@ -7,7 +7,8 @@ import org.firstinspires.ftc.teamcode.utilities.geometry.Transform2d;
 import org.firstinspires.ftc.teamcode.utilities.geometry.Translation2d;
 
 public class LimelightConstants {
-    public static double cameraHeightFromGround = 300;
+    public static double cameraHeightFromGround = 4.5;
+    public static double targetHeightFromGround = 1.5;
     public static double cameraAngleFromXAxis = 30;
     public static double lateralDistance = 0;
     public static double distanceLimelight = 0;

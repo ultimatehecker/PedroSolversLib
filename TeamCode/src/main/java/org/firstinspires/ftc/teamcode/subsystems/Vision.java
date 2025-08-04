@@ -7,6 +7,7 @@ import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -28,6 +29,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Vision extends SubsystemBase {
@@ -43,6 +45,7 @@ public class Vision extends SubsystemBase {
     private Position arducamPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
     private YawPitchRollAngles arducamOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
 
+    private List<Pose2d> fieldTargets;
     private double distance;
     private double tx;
     private double ty;
@@ -72,40 +75,91 @@ public class Vision extends SubsystemBase {
         this.telemetryManager = telemetryManager;
     }
 
-    public void computeCameraToSample() {
+    private void computeCameraToSample() {
         LLResult llResult = limelight.getLatestResult();
-        if (llResult != null && llResult.isValid()) {
-            tx = llResult.getDetectorResults().get(0).getTargetXDegrees();
-            ty = llResult.getDetectorResults().get(0).getTargetYDegrees();
-            confidence = llResult.getDetectorResults().get(0).getConfidence();
 
-            // X and Y are reversed because pedropathing uses a different coordinate system
-            double x = LimelightConstants.cameraHeightFromGround * Math.tan(Math.toRadians(ty) + 90 - LimelightConstants.cameraAngleFromXAxis);
-            double y = Math.sqrt(x * x + LimelightConstants.cameraHeightFromGround * LimelightConstants.cameraHeightFromGround) * (Math.tan(Math.toRadians(tx)));
+        if (llResult == null || !llResult.isValid()) return;
 
-            double theta = Math.atan((y + LimelightConstants.lateralDistance) / (x + LimelightConstants.distanceLimelight));
-            distance = Math.sqrt((y + LimelightConstants.lateralDistance) * (y + LimelightConstants.lateralDistance) + (x + LimelightConstants.distanceLimelight) * (x + LimelightConstants.distanceLimelight));
+        LLResultTypes.DetectorResult result = llResult.getDetectorResults().get(0);
+        tx = result.getTargetXDegrees(); // horizontal angle
+        ty = result.getTargetYDegrees(); // vertical angle
+        confidence = result.getConfidence();
 
-            limelightToTarget = new Pose2d(x, y, Rotation2d.fromDegrees(theta));
+        // Constants from your LimelightConstants class
+        double cameraHeight = LimelightConstants.cameraHeightFromGround; // in inches
+        double targetHeight = LimelightConstants.targetHeightFromGround; // in inches
+        double cameraPitch = LimelightConstants.cameraAngleFromXAxis;    // in degrees
+
+        // Angle from horizontal to target
+        double totalVerticalAngle = Math.toRadians(ty + cameraPitch);
+        double heightDifference = targetHeight - cameraHeight;
+
+        // Forward distance from robot to target
+        double x = heightDifference / Math.tan(totalVerticalAngle);
+
+        // Lateral offset based on horizontal angle
+        double y = Math.tan(Math.toRadians(tx)) * x;
+
+        // Estimate target's pose relative to robot
+        limelightToTarget = new Pose2d(x, y, new Rotation2d(Math.toRadians(tx)));
+    }
+
+    public void computeFieldCoordinates(Pose2d robotPose) {
+        List<Pose2d> fieldTargets = new ArrayList<>();
+
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult == null || !llResult.isValid()) return;
+
+        // Include Limelight's yaw into transform
+        Rotation2d cameraYaw = Rotation2d.fromDegrees(-30); // yaw to the right
+        Transform2d limelightTransform = new Transform2d(
+                relativeLimelightOffset.getTranslation(),
+                relativeLimelightOffset.getRotation().plus(cameraYaw)
+        );
+
+        Pose2d limelightPose = robotPose.transformBy(limelightTransform);
+
+        for (LLResultTypes.DetectorResult result : llResult.getDetectorResults()) {
+            double tx = result.getTargetXDegrees();
+            double ty = result.getTargetYDegrees();
+            double confidence = result.getConfidence();
+
+            // Optional: filter out low-confidence detections
+            if (confidence < 0.5) continue;
+
+            // Estimate position relative to the limelight
+            double cameraHeight = LimelightConstants.cameraHeightFromGround;
+            double targetHeight = LimelightConstants.targetHeightFromGround;
+            double pitch = LimelightConstants.cameraAngleFromXAxis;
+
+            double totalVerticalAngle = Math.toRadians(ty + pitch);
+            double heightDifference = targetHeight - cameraHeight;
+
+            double x = heightDifference / Math.tan(totalVerticalAngle);
+            double y = Math.tan(Math.toRadians(tx)) * x;
+
+            Pose2d targetRelToCamera = new Pose2d(x, y, Rotation2d.fromDegrees(tx));
+
+            // Transform to field-space
+            Pose2d targetFieldPose = limelightPose.transformBy(
+                    new Transform2d(
+                            targetRelToCamera.getTranslation(),
+                            targetRelToCamera.getRotation()
+                    )
+            );
+
+            fieldTargets.add(targetFieldPose);
         }
     }
 
-    public void computeLimelightFieldCoordinates(Pose2d robotPose) {
-        limelightFieldCoordinates = robotPose.transformBy(relativeLimelightOffset);
-
-        //telemetryManager.debug("LL FCoords X: " + limelightFieldCoordinates.getX());
-        //telemetryManager.debug("LL FCoords Y: " + limelightFieldCoordinates.getY());
-        //telemetryManager.debug("LL FCoords θ: " + limelightFieldCoordinates.getRotation());
+    public List<Pose2d> getSampleFieldCoordinates() {
+        return fieldTargets;
     }
 
 
     @Override
     public void periodic() {
         computeCameraToSample();
-
-        telemetryManager.debug("LL FCoords X: " + limelightFieldCoordinates.getX());
-        telemetryManager.debug("LL FCoords Y: " + limelightFieldCoordinates.getY());
-        telemetryManager.debug("LL FCoords θ: " + limelightFieldCoordinates.getRotation());
 
         telemetryManager.debug("Detector Tx: " + tx);
         telemetryManager.debug("Detector Ty: " + ty);

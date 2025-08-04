@@ -32,7 +32,7 @@ public class DrivetrainController extends CommandBase {
     @Override
     public void execute() {
         drivetrain.setMovementVectors(forward.getAsDouble(), -strafe.getAsDouble(), -rotation.getAsDouble() * 0.6, false);
-        vision.computeLimelightFieldCoordinates(drivetrain.getPose());
+        vision.computeFieldCoordinates(drivetrain.getPose());
         drivetrain.follower.update();
     }
 }
