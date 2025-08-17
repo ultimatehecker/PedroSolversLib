@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.utilities.geometry;
+package org.firstinspires.ftc.library.geometry;
 
 /**
  * A change in distance along a 2D arc since the last pose update. We can use ideas from
@@ -8,8 +8,13 @@ package org.firstinspires.ftc.teamcode.utilities.geometry;
  */
 
 public class Twist2d {
+    /** Linear "dx" component. */
     public double dx;
+
+    /** Linear "dy" component */
     public double dy;
+
+    /** Angular "dtheta" component (radians). */
     public double dtheta;
 
     public Twist2d() {}
@@ -39,12 +44,11 @@ public class Twist2d {
      * @param obj The other object.
      * @return Whether the two objects are equal or not.
      */
+
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof com.seattlesolvers.solverslib.geometry.Twist2d) {
-            return Math.abs(((com.seattlesolvers.solverslib.geometry.Twist2d) obj).dx - dx) < 1E-9
-                    && Math.abs(((com.seattlesolvers.solverslib.geometry.Twist2d) obj).dy - dy) < 1E-9
-                    && Math.abs(((com.seattlesolvers.solverslib.geometry.Twist2d) obj).dtheta - dtheta) < 1E-9;
+        if (obj instanceof Twist2d) {
+            return Math.abs(((Twist2d) obj).dx - dx) < 1E-9 && Math.abs(((Twist2d) obj).dy - dy) < 1E-9 && Math.abs(((Twist2d) obj).dtheta - dtheta) < 1E-9;
         }
 
         return false;

@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode.utilities.geometry;
+package org.firstinspires.ftc.library.geometry;
 
-import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
+import org.firstinspires.ftc.library.geometry.Rotation2d;
 
 /**
  * Represents a translation in 2D space. This object can be used to represent a point or a vector.
@@ -10,12 +10,13 @@ import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
  */
 
 public class Translation2d {
-    private final double m_x;
-    private final double m_y;
+    private final double x;
+    private final double y;
 
     /**
      * Constructs a Translation2d with X and Y components equal to zero.
      */
+
     public Translation2d() {
         this(0.0, 0.0);
     }
@@ -27,9 +28,10 @@ public class Translation2d {
      * @param x The x component of the translation.
      * @param y The y component of the translation.
      */
+
     public Translation2d(double x, double y) {
-        m_x = x;
-        m_y = y;
+        this.x = x;
+        this.y = y;
     }
 
     /**
@@ -41,8 +43,9 @@ public class Translation2d {
      * @param other The translation to compute the distance to.
      * @return The distance between the two translations.
      */
+
     public double getDistance(Translation2d other) {
-        return Math.hypot(other.m_x - m_x, other.m_y - m_y);
+        return Math.hypot(other.x - x, other.y - y);
     }
 
     /**
@@ -50,8 +53,9 @@ public class Translation2d {
      *
      * @return The x component of the translation.
      */
+
     public double getX() {
-        return m_x;
+        return x;
     }
 
     /**
@@ -59,8 +63,9 @@ public class Translation2d {
      *
      * @return The y component of the translation.
      */
+
     public double getY() {
-        return m_y;
+        return y;
     }
 
     /**
@@ -68,8 +73,9 @@ public class Translation2d {
      *
      * @return The norm of the translation.
      */
+
     public double getNorm() {
-        return Math.hypot(m_x, m_y);
+        return Math.hypot(x, y);
     }
 
     /**
@@ -86,10 +92,11 @@ public class Translation2d {
      * @param other The rotation to rotate the translation by.
      * @return The new rotated translation.
      */
+
     public Translation2d rotateBy(Rotation2d other) {
         return new Translation2d(
-                m_x * other.getCos() - m_y * other.getSin(),
-                m_x * other.getSin() + m_y * other.getCos()
+                x * other.getCos() - y * other.getSin(),
+                x * other.getSin() + y * other.getCos()
         );
     }
 
@@ -103,9 +110,9 @@ public class Translation2d {
      * @param other The translation to add.
      * @return The sum of the translations.
      */
-    public Translation2d plus(Translation2d
-    other) {
-        return new Translation2d(m_x + other.m_x, m_y + other.m_y);
+
+    public Translation2d plus(Translation2d other) {
+        return new Translation2d(x + other.x, y + other.y);
     }
 
     /**
@@ -118,9 +125,9 @@ public class Translation2d {
      * @param other The translation to subtract.
      * @return The difference between the two translations.
      */
-    public Translation2d minus(Translation2d
-    other) {
-        return new Translation2d(m_x - other.m_x, m_y - other.m_y);
+
+    public Translation2d minus(Translation2d other) {
+        return new Translation2d(x - other.x, y - other.y);
     }
 
     /**
@@ -130,8 +137,9 @@ public class Translation2d {
      *
      * @return The inverse of the current translation.
      */
+
     public Translation2d unaryMinus() {
-        return new Translation2d(-m_x, -m_y);
+        return new Translation2d(-x, -y);
     }
 
     /**
@@ -142,8 +150,9 @@ public class Translation2d {
      * @param scalar The scalar to multiply by.
      * @return The scaled translation.
      */
+
     public Translation2d times(double scalar) {
-        return new Translation2d(m_x * scalar, m_y * scalar);
+        return new Translation2d(x * scalar, y * scalar);
     }
 
     /**
@@ -154,13 +163,14 @@ public class Translation2d {
      * @param scalar The scalar to multiply by.
      * @return The reference to the new mutated object.
      */
+
     public Translation2d div(double scalar) {
-        return new Translation2d(m_x / scalar, m_y / scalar);
+        return new Translation2d(x / scalar, y / scalar);
     }
 
     @Override
     public String toString() {
-        return String.format("Translation2d(X: %.2f, Y: %.2f)", m_x, m_y);
+        return String.format("Translation2d(X: %.2f, Y: %.2f)", x, y);
     }
 
     /**
@@ -172,9 +182,9 @@ public class Translation2d {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Translation2d) {
-            return Math.abs(((Translation2d) obj).m_x - m_x) < 1E-9
-                    && Math.abs(((Translation2d) obj).m_y - m_y) < 1E-9;
+            return Math.abs(((Translation2d) obj).x - x) < 1E-9 && Math.abs(((Translation2d) obj).y - y) < 1E-9;
         }
+
         return false;
     }
 

@@ -10,8 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 
-import org.firstinspires.ftc.teamcode.utilities.geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
+import org.firstinspires.ftc.library.geometry.Pose2d;
 
 @TeleOp(name="LimelightLogging")
 public class LimelightLogging extends OpMode {

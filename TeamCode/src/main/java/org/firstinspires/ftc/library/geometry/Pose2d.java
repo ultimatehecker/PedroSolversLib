@@ -1,24 +1,23 @@
-package org.firstinspires.ftc.teamcode.utilities.geometry;
+package org.firstinspires.ftc.library.geometry;
 
 import com.pedropathing.localization.Pose;
 
-import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Transform2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Translation2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Twist2d;
-
-/** Represents a 2D pose containing translational and rotational elements. */
+/**
+ * A two-dimensional position that includes a {@link Vector2d} and
+ * a heading angle. Look at {@link Vector2d} for information on what
+ * some of these methods do.
+ */
 public class Pose2d {
-    private final Translation2d m_translation;
-    private final Rotation2d m_rotation;
+    private final Translation2d translation;
+    private final Rotation2d rotation;
 
     /**
      * Constructs a pose at the origin facing toward the positive X axis.
      * (Translation2d{0, 0} and Rotation{0})
      */
     public Pose2d() {
-        m_translation = new Translation2d();
-        m_rotation = new Rotation2d();
+        this.translation = new Translation2d();
+        this.rotation = new Rotation2d();
     }
 
     /**
@@ -28,8 +27,8 @@ public class Pose2d {
      * @param rotation    The rotational component of the pose.
      */
     public Pose2d(Translation2d translation, Rotation2d rotation) {
-        m_translation = translation;
-        m_rotation = rotation;
+        this.translation = translation;
+        this.rotation = rotation;
     }
 
     /**
@@ -42,8 +41,8 @@ public class Pose2d {
      */
     @SuppressWarnings("ParameterName")
     public Pose2d(double x, double y, Rotation2d rotation) {
-        m_translation = new Translation2d(x, y);
-        m_rotation = rotation;
+        this.translation = new Translation2d(x, y);
+        this.rotation = rotation;
     }
 
     /**
@@ -79,7 +78,7 @@ public class Pose2d {
      * @return The translational component of the pose.
      */
     public Translation2d getTranslation() {
-        return m_translation;
+        return translation;
     }
 
     /**
@@ -88,7 +87,7 @@ public class Pose2d {
      * @return The rotational component of the pose.
      */
     public Rotation2d getRotation() {
-        return m_rotation;
+        return rotation;
     }
 
     /**
@@ -99,7 +98,8 @@ public class Pose2d {
      * @return The transformed pose.
      */
     public Pose2d transformBy(Transform2d other) {
-        return new Pose2d(m_translation.plus(other.getTranslation().rotateBy(m_rotation)), m_rotation.plus(other.getRotation()));
+        return new Pose2d(translation.plus(other.getTranslation().rotateBy(rotation)),
+                rotation.plus(other.getRotation()));
     }
 
     /**
@@ -122,14 +122,14 @@ public class Pose2d {
      * @return the x value from the {@link Translation2d}
      */
     public double getX() {
-        return m_translation.getX();
+        return translation.getX();
     }
 
     /**
      * @return the y value from the {@link Translation2d}
      */
     public double getY() {
-        return m_translation.getY();
+        return translation.getY();
     }
 
     /**
@@ -171,7 +171,8 @@ public class Pose2d {
             s = sinTheta / dtheta;
             c = (1 - cosTheta) / dtheta;
         }
-        Transform2d transform = new Transform2d(new Translation2d(dx * s - dy * c, dx * c + dy * s), new Rotation2d(cosTheta, sinTheta));
+        Transform2d transform = new Transform2d(new Translation2d(dx * s - dy * c, dx * c + dy * s),
+                new Rotation2d(cosTheta, sinTheta));
 
         return this.plus(transform);
     }
@@ -206,7 +207,7 @@ public class Pose2d {
 
     @Override
     public String toString() {
-        return String.format("Pose2d(%s, %s)", m_translation, m_rotation);
+        return String.format("Pose2d(%s, %s)", translation, rotation);
     }
 
     /**
@@ -218,21 +219,21 @@ public class Pose2d {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Pose2d) {
-            return ((Pose2d) obj).m_translation.equals(m_translation)
-                    && ((Pose2d) obj).m_rotation.equals(m_rotation);
+            return ((Pose2d) obj).translation.equals(translation)
+                    && ((Pose2d) obj).rotation.equals(rotation);
         }
         return false;
     }
 
     public Pose2d rotate(double deltaTheta) {
-        return new Pose2d(m_translation, new Rotation2d(getHeading() + deltaTheta));
+        return new Pose2d(translation, new Rotation2d(getHeading() + deltaTheta));
     }
 
     public double getHeading() {
-        return m_rotation.getRadians();
+        return rotation.getRadians();
     }
 
     public Pose getAsPedroPose() {
-        return new Pose(m_translation.getX(), m_translation.getY(), m_rotation.getRadians());
+        return new Pose(translation.getX(), translation.getY(), rotation.getRadians());
     }
 }

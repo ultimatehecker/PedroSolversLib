@@ -9,11 +9,11 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.commands.DriveToVisionTarget;
 import org.firstinspires.ftc.teamcode.commands.DrivetrainController;
 import org.firstinspires.ftc.teamcode.commands.group.PickSample;
 import org.firstinspires.ftc.teamcode.commands.group.PrepareIntake;
@@ -50,6 +50,7 @@ public class RobotController extends CommandOpMode {
     private GamepadButton retractAndTransfer;
     private GamepadButton intakeClaw;
     private GamepadButton manuipulatorClaw;
+    private GamepadButton autoIntaking;
 
     private TelemetryManager telemetryManager;
     private long lastTime = 0;
@@ -81,6 +82,7 @@ public class RobotController extends CommandOpMode {
 
         intakeClaw = new GamepadButton(operatorController, GamepadKeys.Button.CROSS);
         manuipulatorClaw = new GamepadButton(operatorController, GamepadKeys.Button.TRIANGLE);
+        autoIntaking = new GamepadButton(driverController, GamepadKeys.Button.RIGHT_STICK_BUTTON);
 
         register(drivetrain, elevator, manipulator, intake, vision);
 
@@ -101,6 +103,8 @@ public class RobotController extends CommandOpMode {
                 new ScoreSampleThenRetract(manipulator, elevator),
                 () -> sampleSpecimanState == Manipulator.SampleSpecimanState.SPEC
         ));
+
+        autoIntaking.whenPressed(new DriveToVisionTarget(drivetrain, vision, telemetryManager));
 
         prepareIntake.whenPressed(new PrepareIntake(intake, elevator));
         pickSample.whenPressed(new PickSample(intake));

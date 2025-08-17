@@ -1,41 +1,25 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.follower.FollowerConstants;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.localization.Localizer;
 import com.pedropathing.localization.Pose;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import com.seattlesolvers.solverslib.command.Command;
-import com.seattlesolvers.solverslib.command.Subsystem;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.solversHardware.SolversMotor;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.library.geometry.Pose2d;
+import org.firstinspires.ftc.library.geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
-import org.firstinspires.ftc.teamcode.utilities.Units;
 import org.firstinspires.ftc.teamcode.utilities.constansts.DrivetrainConstants;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
-
-import java.util.Collections;
-import java.util.Set;
 
 public class Drivetrain extends SubsystemBase {
     private SolversMotor leftFront;
@@ -81,6 +65,7 @@ public class Drivetrain extends SubsystemBase {
         rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         follower = new Follower(aHardwareMap, FConstants.class, LConstants.class);
+        follower.setStartingPose(new Pose(0,0,0));
         this.telemetryManager = telemetryManager;
 
         initializeImu(aHardwareMap);

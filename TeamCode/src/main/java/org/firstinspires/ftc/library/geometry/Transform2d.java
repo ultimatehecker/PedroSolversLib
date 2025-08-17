@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.utilities.geometry;
+package org.firstinspires.ftc.library.geometry;
 
-import org.firstinspires.ftc.teamcode.utilities.geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Translation2d;
+import org.firstinspires.ftc.library.geometry.Pose2d;
+import org.firstinspires.ftc.library.geometry.Rotation2d;
+import org.firstinspires.ftc.library.geometry.Translation2d;
 
 /** Represents a transformation for a Pose2d in the pose's frame. */
 public class Transform2d {
-    private final Translation2d m_translation;
-    private final Rotation2d m_rotation;
+    private final Translation2d translation;
+    private final Rotation2d rotation;
 
     /**
      * Constructs the transform that maps the initial pose to the final pose.
@@ -15,12 +15,11 @@ public class Transform2d {
      * @param initial The initial pose for the transformation.
      * @param last    The final pose for the transformation.
      */
+
     public Transform2d(Pose2d initial, Pose2d last) {
-        // We are rotating the difference between the translations
-        // using a clockwise rotation matrix. This transforms the global
-        // delta into a local delta (relative to the initial pose).
-        m_translation = last.getTranslation().minus(initial.getTranslation()).rotateBy(initial.getRotation().unaryMinus());
-        m_rotation = last.getRotation().minus(initial.getRotation());
+        // We are rotating the difference between the translations using a clockwise rotation matrix. This transforms the global delta into a local delta (relative to the initial pose).
+        translation = last.getTranslation().minus(initial.getTranslation()).rotateBy(initial.getRotation().unaryMinus());
+        rotation = last.getRotation().minus(initial.getRotation());
     }
 
     /**
@@ -29,17 +28,19 @@ public class Transform2d {
      * @param translation Translational component of the transform.
      * @param rotation    Rotational component of the transform.
      */
+
     public Transform2d(Translation2d translation, Rotation2d rotation) {
-        m_translation = translation;
-        m_rotation = rotation;
+        this.translation = translation;
+        this.rotation = rotation;
     }
 
     /**
      * Constructs the identity transform -- maps an initial pose to itself.
      */
+
     public Transform2d() {
-        m_translation = new Translation2d();
-        m_rotation = new Rotation2d();
+        translation = new Translation2d();
+        rotation = new Rotation2d();
     }
 
     /**
@@ -48,8 +49,9 @@ public class Transform2d {
      * @param scalar The scalar.
      * @return The scaled Transform2d.
      */
+
     public Transform2d times(double scalar) {
-        return new Transform2d(m_translation.times(scalar), m_rotation.times(scalar));
+        return new Transform2d(translation.times(scalar), rotation.times(scalar));
     }
 
     /**
@@ -57,8 +59,9 @@ public class Transform2d {
      *
      * @return The translational component of the transform.
      */
+
     public Translation2d getTranslation() {
-        return m_translation;
+        return translation;
     }
 
     /**
@@ -66,13 +69,14 @@ public class Transform2d {
      *
      * @return Reference to the rotational component of the transform.
      */
+
     public Rotation2d getRotation() {
-        return m_rotation;
+        return rotation;
     }
 
     @Override
     public String toString() {
-        return String.format("Transform2d(%s, %s)", m_translation, m_rotation);
+        return String.format("Transform2d(%s, %s)", translation, rotation);
     }
 
     /**
@@ -81,12 +85,13 @@ public class Transform2d {
      * @param obj The other object.
      * @return Whether the two objects are equal or not.
      */
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Transform2d) {
-            return ((Transform2d) obj).m_translation.equals(m_translation)
-                    && ((Transform2d) obj).m_rotation.equals(m_rotation);
+            return ((Transform2d) obj).translation.equals(translation) && ((Transform2d) obj).rotation.equals(rotation);
         }
+        
         return false;
     }
 
@@ -95,9 +100,9 @@ public class Transform2d {
      *
      * @return The inverted transformation.
      */
+
     public Transform2d inverse() {
-        // We are rotating the difference between the translations using a clockwise rotation matrix. This transforms the global
-        // delta into a local delta (relative to the initial pose).
+        // We are rotating the difference between the translations using a clockwise rotation matrix. This transforms the global delta into a local delta (relative to the initial pose).
         return new Transform2d(getTranslation().unaryMinus().rotateBy(getRotation().unaryMinus()), getRotation().unaryMinus());
     }
 

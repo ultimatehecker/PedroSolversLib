@@ -20,10 +20,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.utilities.constansts.LimelightConstants;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Rotation2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Transform2d;
-import org.firstinspires.ftc.teamcode.utilities.geometry.Translation2d;
+import org.firstinspires.ftc.library.geometry.Pose2d;
+import org.firstinspires.ftc.library.geometry.Rotation2d;
+import org.firstinspires.ftc.library.geometry.Transform2d;
+import org.firstinspires.ftc.library.geometry.Translation2d;
 
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -66,12 +66,13 @@ public class Vision extends SubsystemBase {
     private Vision(HardwareMap aHardwareMap, TelemetryManager telemetryManager) {
         limelight = aHardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
-        limelight.setPollRateHz(100);
+        limelight.setPollRateHz(20);
         limelight.start();
 
         relativeLimelightOffset = new Transform2d(new Translation2d(4.963, 1.618), new Rotation2d());
         limelightFieldCoordinates = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
+        fieldTargets = new ArrayList<Pose2d>();
         this.telemetryManager = telemetryManager;
     }
 
@@ -85,70 +86,76 @@ public class Vision extends SubsystemBase {
         ty = result.getTargetYDegrees(); // vertical angle
         confidence = result.getConfidence();
 
-        // Constants from your LimelightConstants class
+        // Constants
         double cameraHeight = LimelightConstants.cameraHeightFromGround; // in inches
         double targetHeight = LimelightConstants.targetHeightFromGround; // in inches
-        double cameraPitch = LimelightConstants.cameraAngleFromXAxis;    // in degrees
+        // 👇 make pitch negative if camera is tilted downward
+        double cameraPitch = -Math.abs(LimelightConstants.cameraAngleFromXAxis);
 
-        // Angle from horizontal to target
+        // Vertical geometry
         double totalVerticalAngle = Math.toRadians(ty + cameraPitch);
         double heightDifference = targetHeight - cameraHeight;
 
-        // Forward distance from robot to target
+        // Forward distance
         double x = heightDifference / Math.tan(totalVerticalAngle);
 
-        // Lateral offset based on horizontal angle
+        // Lateral offset
         double y = Math.tan(Math.toRadians(tx)) * x;
 
-        // Estimate target's pose relative to robot
+        // Estimate target pose relative to camera
         limelightToTarget = new Pose2d(x, y, new Rotation2d(Math.toRadians(tx)));
+
+        telemetryManager.debug("[LL] tx=" + tx + " ty=" + ty + " conf=" + confidence);
+        telemetryManager.debug("[LL] cameraPitch=" + cameraPitch + " totalVertAngle=" + Math.toDegrees(totalVerticalAngle));
+        telemetryManager.debug("[LL] relTarget=" + limelightToTarget);
+    }
+
+
+    public boolean isLLResultThere() {
+        LLResult llResult = limelight.getLatestResult();
+        return llResult != null && llResult.isValid();
     }
 
     public void computeFieldCoordinates(Pose2d robotPose) {
-        List<Pose2d> fieldTargets = new ArrayList<>();
-
         LLResult llResult = limelight.getLatestResult();
         if (llResult == null || !llResult.isValid()) return;
 
-        // Include Limelight's yaw into transform
+        fieldTargets.clear();
+
+        // Include Limelight's yaw
         Rotation2d cameraYaw = Rotation2d.fromDegrees(-30); // yaw to the right
         Transform2d limelightTransform = new Transform2d(
                 relativeLimelightOffset.getTranslation(),
                 relativeLimelightOffset.getRotation().plus(cameraYaw)
         );
-
         Pose2d limelightPose = robotPose.transformBy(limelightTransform);
 
         for (LLResultTypes.DetectorResult result : llResult.getDetectorResults()) {
             double tx = result.getTargetXDegrees();
             double ty = result.getTargetYDegrees();
-            double confidence = result.getConfidence();
+            double conf = result.getConfidence();
 
-            // Optional: filter out low-confidence detections
-            if (confidence < 0.5) continue;
+            if (conf < 0.3) continue;
 
-            // Estimate position relative to the limelight
+            // Geometry
             double cameraHeight = LimelightConstants.cameraHeightFromGround;
             double targetHeight = LimelightConstants.targetHeightFromGround;
-            double pitch = LimelightConstants.cameraAngleFromXAxis;
+            double cameraPitch = -Math.abs(LimelightConstants.cameraAngleFromXAxis);
 
-            double totalVerticalAngle = Math.toRadians(ty + pitch);
+            double totalVerticalAngle = Math.toRadians(ty + cameraPitch);
             double heightDifference = targetHeight - cameraHeight;
 
             double x = heightDifference / Math.tan(totalVerticalAngle);
             double y = Math.tan(Math.toRadians(tx)) * x;
 
-            Pose2d targetRelToCamera = new Pose2d(x, y, Rotation2d.fromDegrees(tx));
-
-            // Transform to field-space
-            Pose2d targetFieldPose = limelightPose.transformBy(
-                    new Transform2d(
-                            targetRelToCamera.getTranslation(),
-                            targetRelToCamera.getRotation()
-                    )
+            Pose2d relTarget = new Pose2d(x, y, Rotation2d.fromDegrees(tx));
+            Pose2d fieldTarget = limelightPose.transformBy(
+                    new Transform2d(relTarget.getTranslation(), relTarget.getRotation())
             );
 
-            fieldTargets.add(targetFieldPose);
+            fieldTargets.add(fieldTarget);
+
+            telemetryManager.debug("[LL] fieldTarget=" + fieldTarget + " conf=" + conf);
         }
     }
 
@@ -160,9 +167,12 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         computeCameraToSample();
+        LLResult llResult = limelight.getLatestResult();
 
         telemetryManager.debug("Detector Tx: " + tx);
         telemetryManager.debug("Detector Ty: " + ty);
         telemetryManager.debug("Detector Confidence: " + confidence);
+        telemetryManager.debug("Sample From Limelight: " + limelightToTarget);
+        telemetryManager.debug("FieldTargets: " + getSampleFieldCoordinates());
     }
 }

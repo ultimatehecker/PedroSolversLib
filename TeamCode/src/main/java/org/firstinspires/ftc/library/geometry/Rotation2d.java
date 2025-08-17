@@ -1,4 +1,9 @@
-package org.firstinspires.ftc.teamcode.utilities.geometry;
+package org.firstinspires.ftc.library.geometry;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
 
 /**
  * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
@@ -9,9 +14,9 @@ package org.firstinspires.ftc.teamcode.utilities.geometry;
  */
 
 public class Rotation2d {
-    private final double m_value;
-    private final double m_cos;
-    private final double m_sin;
+    private final double value;
+    private final double cos;
+    private final double sin;
 
     public final static Rotation2d kPi = new Rotation2d(Math.PI);
 
@@ -19,9 +24,9 @@ public class Rotation2d {
      * Constructs a Rotation2d with a default angle of 0 degrees.
      */
     public Rotation2d() {
-        m_value = 0.0;
-        m_cos = 1.0;
-        m_sin = 0.0;
+        this.value = 0.0;
+        this.cos = 1.0;
+        this.sin = 0.0;
     }
 
     /**
@@ -33,9 +38,9 @@ public class Rotation2d {
     public Rotation2d(double value) {
         while (value > Math.PI) value -= 2 * Math.PI;
         while (value < -Math.PI) value += 2 * Math.PI;
-        m_value = value;
-        m_cos = Math.cos(value);
-        m_sin = Math.sin(value);
+        this.value = value;
+        cos = Math.cos(value);
+        sin = Math.sin(value);
     }
 
     /**
@@ -49,13 +54,14 @@ public class Rotation2d {
     public Rotation2d(double x, double y) {
         double magnitude = Math.hypot(x, y);
         if (magnitude > 1e-6) {
-            m_sin = y / magnitude;
-            m_cos = x / magnitude;
+            sin = y / magnitude;
+            cos = x / magnitude;
         } else {
-            m_sin = 0.0;
-            m_cos = 1.0;
+            sin = 0.0;
+            cos = 1.0;
         }
-        m_value = Math.atan2(m_sin, m_cos);
+
+        value = Math.atan2(sin, cos);
     }
 
     /**
@@ -103,7 +109,7 @@ public class Rotation2d {
      * @return The inverse of the current rotation.
      */
     public Rotation2d unaryMinus() {
-        return new Rotation2d(-m_value);
+        return new Rotation2d(-value);
     }
 
     /**
@@ -113,7 +119,7 @@ public class Rotation2d {
      * @return The new scaled Rotation2d.
      */
     public Rotation2d times(double scalar) {
-        return new Rotation2d(m_value * scalar);
+        return new Rotation2d(value * scalar);
     }
 
     /**
@@ -129,8 +135,8 @@ public class Rotation2d {
      */
     public Rotation2d rotateBy(Rotation2d other) {
         return new Rotation2d(
-                m_cos * other.m_cos - m_sin * other.m_sin,
-                m_cos * other.m_sin + m_sin * other.m_cos
+                cos * other.cos - sin * other.sin,
+                cos * other.sin + sin * other.cos
         );
     }
 
@@ -140,7 +146,7 @@ public class Rotation2d {
      * @return The radian value of the rotation.
      */
     public double getRadians() {
-        return m_value;
+        return value;
     }
 
     /**
@@ -149,7 +155,7 @@ public class Rotation2d {
      * @return The degree value of the rotation.
      */
     public double getDegrees() {
-        return Math.toDegrees(m_value);
+        return Math.toDegrees(value);
     }
 
     /**
@@ -158,7 +164,7 @@ public class Rotation2d {
      * @return The cosine of the rotation.
      */
     public double getCos() {
-        return m_cos;
+        return cos;
     }
 
     /**
@@ -167,7 +173,7 @@ public class Rotation2d {
      * @return The sine of the rotation.
      */
     public double getSin() {
-        return m_sin;
+        return sin;
     }
 
     /**
@@ -176,12 +182,12 @@ public class Rotation2d {
      * @return The tangent of the rotation.
      */
     public double getTan() {
-        return m_sin / m_cos;
+        return sin / cos;
     }
 
     @Override
     public String toString() {
-        return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", m_value, Math.toDegrees(m_value));
+        return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", value, Math.toDegrees(value));
     }
 
     /**
@@ -193,7 +199,7 @@ public class Rotation2d {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Rotation2d) {
-            return Math.abs(((Rotation2d) obj).m_value - m_value) < 1E-9;
+            return Math.abs(((Rotation2d) obj).value - value) < 1E-9;
         }
         return false;
     }
