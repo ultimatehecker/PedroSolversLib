@@ -13,7 +13,7 @@ import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.commands.DriveToVisionTarget;
+import org.firstinspires.ftc.teamcode.commands.DriveToTargetCommand;
 import org.firstinspires.ftc.teamcode.commands.DrivetrainController;
 import org.firstinspires.ftc.teamcode.commands.group.PickSample;
 import org.firstinspires.ftc.teamcode.commands.group.PrepareIntake;
@@ -104,7 +104,7 @@ public class RobotController extends CommandOpMode {
                 () -> sampleSpecimanState == Manipulator.SampleSpecimanState.SPEC
         ));
 
-        autoIntaking.whenPressed(new DriveToVisionTarget(drivetrain, vision, telemetryManager));
+        autoIntaking.whenPressed(new DriveToTargetCommand(drivetrain, vision, telemetryManager));
 
         prepareIntake.whenPressed(new PrepareIntake(intake, elevator));
         pickSample.whenPressed(new PickSample(intake));

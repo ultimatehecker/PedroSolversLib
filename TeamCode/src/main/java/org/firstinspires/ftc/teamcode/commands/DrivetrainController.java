@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
+import java.util.List;
 import java.util.function.DoubleSupplier;
 
 public class DrivetrainController extends CommandBase {
@@ -32,7 +33,7 @@ public class DrivetrainController extends CommandBase {
     @Override
     public void execute() {
         drivetrain.setMovementVectors(forward.getAsDouble(), -strafe.getAsDouble(), -rotation.getAsDouble() * 0.6, false);
-        vision.computeFieldCoordinates(drivetrain.getPose());
+        List<Vision.Detection> found = vision.getDetectionsField(drivetrain.getPose());
         drivetrain.follower.update();
     }
 }
