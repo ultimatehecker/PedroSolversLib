@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.utilities.constansts;
 
+import com.bylazar.ftcontrol.panels.configurables.annotations.Configurable;
+
+@Configurable
 public class ManipulatorConstants {
     public static final double manipulatorArmTransferPosition = 0.025;
     public static final double manipulatorArmIntakingPosition = 1.0; //0.96 0.99

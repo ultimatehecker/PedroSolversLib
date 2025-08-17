@@ -130,13 +130,5 @@ public class RobotController extends CommandOpMode {
         telemetryManager.debug("Loop Time (ms): " + loopTimeMs);
         telemetryManager.debug("Game Piece: " + sampleSpecimanState.toString());
         telemetryManager.update(telemetry);
-
-        CommandScheduler.getInstance().onCommandInitialize(command -> {
-            telemetryManager.debug("Command Initialized: " + command.getName());
-        });
-
-        CommandScheduler.getInstance().onCommandFinish(command -> {
-            telemetryManager.debug("Command Finished: " + command.getName());
-        });
     }
 }

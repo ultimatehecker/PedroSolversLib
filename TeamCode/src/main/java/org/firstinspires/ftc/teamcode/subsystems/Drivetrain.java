@@ -17,6 +17,7 @@ import com.seattlesolvers.solverslib.solversHardware.SolversMotor;
 
 import org.firstinspires.ftc.library.geometry.Pose2d;
 import org.firstinspires.ftc.library.geometry.Rotation2d;
+import org.firstinspires.ftc.library.hardware.I2CUltrasonic;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.utilities.constansts.DrivetrainConstants;
@@ -28,6 +29,7 @@ public class Drivetrain extends SubsystemBase {
     private SolversMotor rightRear;
 
     private IMU imu;
+    private I2CUltrasonic rearUltrasonic;
 
     public Follower follower;
 
