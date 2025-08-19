@@ -38,6 +38,11 @@ public class Vision extends SubsystemBase {
     private Pose2d limelightFieldCoordinates;
     private Transform2d relativeLimelightOffset;
 
+    private double x;
+    private double y;
+    private double distance;
+    private double targetAngle;
+
     @IgnoreConfigurable
     static TelemetryManager telemetryManager;
 
@@ -63,12 +68,16 @@ public class Vision extends SubsystemBase {
     }
 
     public static class Detection {
-        public final Pose2d pose;
-        public final double confidence;
+        public final double x;
+        public final double y;
+        public final double distance;
+        public final double targetAngle;
 
-        public Detection(Pose2d pose, double confidence) {
-            this.pose = pose;
-            this.confidence = confidence;
+        public Detection(double x, double y, double distance, double targetAngle) {
+            this.x = x;
+            this.y = y;
+            this.distance = distance;
+            this.targetAngle = targetAngle;
         }
     }
 
@@ -85,35 +94,22 @@ public class Vision extends SubsystemBase {
         int i = 0;
 
         for (LLResultTypes.DetectorResult d : result.getDetectorResults()) {
-            double txDeg = d.getTargetXDegrees();
-            double tyDeg = d.getTargetYDegrees();
-            double confidence = d.getConfidence();
+            x = LimelightConstants.cameraHeightFromGround * Math.tan(Math.toRadians(result.getTy() + 90 - 20));
+            y = Math.sqrt(y * y + LimelightConstants.cameraHeightFromGround * LimelightConstants.cameraHeightFromGround) * Math.tan(Math.toRadians(result.getTx()));
 
-            if (confidence < 0.5) continue;
+            targetAngle = Math.atan((x + LimelightConstants.distanceLimelight) / (y + LimelightConstants.lateralDistance));
+            distance = Math.sqrt((x + LimelightConstants.lateralDistance) * (x + LimelightConstants.lateralDistance) + (y + LimelightConstants.distanceLimelight) * (y + LimelightConstants.distanceLimelight));
 
-            double tx = Math.toRadians(txDeg);
-            double ty = Math.toRadians(tyDeg);
-
-            // Vertical geometry
-            double totalPitch = -20 + ty;
-            double heightDiff = LimelightConstants.targetHeightFromGround - LimelightConstants.cameraHeightFromGround;
-
-            double forward = heightDiff / Math.tan(totalPitch);
-            double sideways = Math.tan(tx) * forward;
-
-            Pose2d relPose = new Pose2d(forward, sideways, new Rotation2d(tx));
-            detections.add(new Detection(relPose, confidence));
+            detections.add(new Detection(x, y, distance, targetAngle));
 
             if(LimelightConstants.enableLogging) {
                 telemetryManager.debug(
-                        String.format("[LL] Relative Pose %d | X: %.2f, Y: %.2f, θ: %.2f rad (%.2f deg) | TX: %.2f, TY: %.2f |",
+                        String.format("[LL] Some Position %d | X: %.2f, Y: %.2f, Distance: %.2f in | Target Angle: %.2f |",
                                 i,
-                                relPose.getTranslation().getX(),
-                                relPose.getTranslation().getY(),
-                                relPose.getRotation().getRadians(),
-                                relPose.getRotation().getDegrees(),
-                                tx,
-                                ty
+                                x,
+                                y,
+                                distance,
+                                targetAngle
                         )
                 );
             }
@@ -121,66 +117,12 @@ public class Vision extends SubsystemBase {
             i++;
         }
 
-        // Sort from high to low confidence
-        detections.sort((a, b) -> Double.compare(b.confidence, a.confidence));
         return detections;
     }
-
-    @SuppressLint("DefaultLocale")
-    public List<Detection> getDetectionsField(Pose2d robotPose) {
-        List<Detection> relativeDetections = getDetectionsRelative();
-        if (relativeDetections.isEmpty()) return relativeDetections;
-
-        // Build camera pose from robot pose
-        Rotation2d cameraYaw = Rotation2d.fromDegrees(-30); // yaw right maybe???
-        Transform2d cameraTransform = new Transform2d(
-                relativeLimelightOffset.getTranslation(),
-                relativeLimelightOffset.getRotation().plus(cameraYaw)
-        );
-
-        Pose2d cameraPose = robotPose.transformBy(cameraTransform);
-        List<Detection> fieldDetections = new ArrayList<>();
-        int i = 0;
-
-        for (Detection d : relativeDetections) {
-            Pose2d fieldPose = cameraPose.transformBy(
-                    new Transform2d(d.pose.getTranslation(), d.pose.getRotation())
-            );
-
-            if(LimelightConstants.enableLogging) {
-                telemetryManager.debug(
-                        String.format("[LL] Field Pose %d | X: %.2f, Y: %.2f, θ: %.2f rad (%.2f deg) | Confidence: %.2f",
-                                i,
-                                fieldPose.getTranslation().getX(),
-                                fieldPose.getTranslation().getY(),
-                                fieldPose.getRotation().getRadians(),
-                                fieldPose.getRotation().getDegrees(),
-                                d.confidence
-                        )
-                );
-            }
-
-            fieldDetections.add(new Detection(fieldPose, d.confidence));
-            i++;
-        }
-
-        if(LimelightConstants.enableLogging) {
-            telemetryManager.debug(
-                    String.format("[LL] Camera Pose | X: %.2f, Y: %.2f, θ: %.2f rad (%.2f deg) |",
-                            cameraPose.getTranslation().getX(),
-                            cameraPose.getTranslation().getY(),
-                            cameraPose.getRotation().getRadians(),
-                            cameraPose.getRotation().getDegrees()
-                    )
-            );
-        }
-
-        return fieldDetections;
-    }
-
 
     @Override
     public void periodic() {
         getLLResult();
+        List<Detection> samples = getDetectionsRelative();
     }
 }

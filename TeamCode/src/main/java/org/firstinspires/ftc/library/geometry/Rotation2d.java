@@ -74,6 +74,10 @@ public class Rotation2d {
         return new Rotation2d(Math.toRadians(degrees));
     }
 
+    public static Rotation2d fromRadians(double radians) {
+        return new Rotation2d(radians);
+    }
+
     /**
      * Adds two rotations together, with the result being bounded between -pi and
      * pi.

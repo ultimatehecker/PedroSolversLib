@@ -33,7 +33,6 @@ public class DrivetrainController extends CommandBase {
     @Override
     public void execute() {
         drivetrain.setMovementVectors(forward.getAsDouble(), -strafe.getAsDouble(), -rotation.getAsDouble() * 0.6, false);
-        List<Vision.Detection> found = vision.getDetectionsField(drivetrain.getPose());
         drivetrain.follower.update();
     }
 }
