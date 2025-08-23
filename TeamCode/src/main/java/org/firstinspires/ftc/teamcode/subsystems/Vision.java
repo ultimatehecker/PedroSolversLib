@@ -7,6 +7,7 @@ import com.bylazar.ftcontrol.panels.Panels;
 import com.bylazar.ftcontrol.panels.configurables.annotations.IgnoreConfigurable;
 import com.bylazar.ftcontrol.panels.integration.TelemetryManager;
 
+import com.pedropathing.localization.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -61,29 +62,52 @@ public class Vision extends SubsystemBase {
         limelight.setPollRateHz(20);
         limelight.start();
 
-        relativeLimelightOffset = new Transform2d(new Translation2d(4.963, 1.618), new Rotation2d());
+        relativeLimelightOffset = new Transform2d(new Translation2d(4, 11.1), new Rotation2d());
         limelightFieldCoordinates = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
         this.telemetryManager = telemetryManager;
     }
 
-    public static class Detection {
-        public final double x;
-        public final double y;
-        public final double distance;
-        public final double targetAngle;
 
-        public Detection(double x, double y, double distance, double targetAngle) {
-            this.x = x;
-            this.y = y;
+    public class Detection {
+        public final Pose2d pose;       // Relative pose (from camera → target)
+        public final double distance;   // Distance in inches
+        public final double angle;      // Angle in radians
+        public final double confidence; // Confidence score (0–1), optional
+
+        // Constructor without confidence
+        public Detection(Pose2d pose, double distance, double angle) {
+            this(pose, distance, angle, 1.0); // default confidence = 1
+        }
+
+        // Constructor with confidence
+        public Detection(Pose2d pose, double distance, double angle, double confidence) {
+            this.pose = pose;
             this.distance = distance;
-            this.targetAngle = targetAngle;
+            this.angle = angle;
+            this.confidence = confidence;
+        }
+
+        @Override
+        public String toString() {
+            return String.format(
+                    "Detection | Pose: (X: %.2f, Y: %.2f, θ: %.2f°) | Distance: %.2f in | Angle: %.2f° | Conf: %.2f",
+                    pose.getX(),
+                    pose.getY(),
+                    Math.toDegrees(pose.getRotation().getRadians()),
+                    distance,
+                    Math.toDegrees(angle),
+                    confidence
+            );
         }
     }
 
-    private void getLLResult() {
+
+            private void getLLResult() {
         limelightResult = limelight.getLatestResult();
     }
+
+    /*
 
     @SuppressLint("DefaultLocale")
     public List<Detection> getDetectionsRelative() {
@@ -120,8 +144,61 @@ public class Vision extends SubsystemBase {
         return detections;
     }
 
+     */
+
+    @SuppressLint("DefaultLocale")
+    public List<Detection> getDetectionsRelative() {
+        LLResult result = limelightResult;
+        if (result == null || !result.isValid()) return Collections.emptyList();
+
+        List<Detection> detections = new ArrayList<>();
+        int i = 0;
+
+        // Assume camera yaw offset in degrees (positive = rotated CCW relative to robot fwd)
+        double cameraYawDeg = -30; // example, adjust to match your mounting
+        Rotation2d cameraYaw = Rotation2d.fromDegrees(cameraYawDeg);
+
+        for (LLResultTypes.DetectorResult d : result.getDetectorResults()) {
+            double x = LimelightConstants.cameraHeightFromGround * Math.tan(Math.toRadians(result.getTy() + 90 - 20)); // vertical math
+            double y = Math.sqrt(x * x + LimelightConstants.cameraHeightFromGround * LimelightConstants.cameraHeightFromGround) * Math.tan(Math.toRadians(result.getTx()));
+
+            double targetAngle = Math.atan((x + LimelightConstants.distanceLimelight) / (y + LimelightConstants.lateralDistance));
+            double distance = Math.sqrt((x + LimelightConstants.lateralDistance) * (x + LimelightConstants.lateralDistance) + (y + LimelightConstants.distanceLimelight) * (y + LimelightConstants.distanceLimelight));
+
+            // Apply yaw correction: rotate (x,y) vector
+            Translation2d raw = new Translation2d(x, y);
+            Translation2d rotated = raw.rotateBy(cameraYaw);
+
+            // Make pose relative to limelight
+            Pose2d relPoseFromLL = new Pose2d(rotated, cameraYaw);
+
+            // Shift to robot center by applying relativeLimelightOffset (translation only)
+            Pose2d relPoseFromRobot = relPoseFromLL.transformBy(relativeLimelightOffset);
+
+            // Build detection
+            detections.add(new Detection(relPoseFromRobot, distance, targetAngle, d.getConfidence()));
+
+            if (LimelightConstants.enableLogging) {
+                telemetryManager.debug(
+                        String.format("[LL] Sample Relative %d | LL->Target: (%.2f, %.2f) | Robot->Target: (%.2f, %.2f) | Dist: %.2f in | θ: %.2f° | Conf: %.2f",
+                                i,
+                                rotated.getX(), rotated.getY(),
+                                relPoseFromRobot.getX(), relPoseFromRobot.getY(),
+                                distance,
+                                Math.toDegrees(targetAngle),
+                                d.getConfidence()
+                        )
+                );
+            }
+            i++;
+        }
+
+        return detections;
+    }
+
     @Override
     public void periodic() {
         getLLResult();
+        List<Detection> thing = getDetectionsRelative();
     }
 }
