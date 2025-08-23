@@ -104,7 +104,7 @@ public class Vision extends SubsystemBase {
 
             if(LimelightConstants.enableLogging) {
                 telemetryManager.debug(
-                        String.format("[LL] Some Position %d | X: %.2f, Y: %.2f, Distance: %.2f in | Target Angle: %.2f |",
+                        String.format("[LL] Sample Relative Position %d | X: %.2f, Y: %.2f, Distance: %.2f in | Target Angle: %.2f |",
                                 i,
                                 x,
                                 y,
@@ -123,6 +123,5 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         getLLResult();
-        List<Detection> samples = getDetectionsRelative();
     }
 }
