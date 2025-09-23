@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.library.settings;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public class CameraPosition {
     private final double x;
     private final double y;
@@ -8,36 +11,36 @@ public class CameraPosition {
     private final double pitch;
     private final double roll;
 
-    public CameraPosition(final double x, final double y, final double z, final double yaw, final double pitch, final double roll) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.yaw = yaw;
-        this.pitch = pitch;
-        this.roll = roll;
+    public CameraPosition(final DistanceUnit distanceUnit, final AngleUnit angleUnit, double x, final double y, final double z, final double yaw, final double pitch, final double roll) {
+        this.x = DistanceUnit.INCH.fromUnit(distanceUnit, x);
+        this.y = DistanceUnit.INCH.fromUnit(distanceUnit, y);;
+        this.z = DistanceUnit.INCH.fromUnit(distanceUnit, z);;
+        this.yaw = AngleUnit.DEGREES.fromUnit(angleUnit, yaw);;
+        this.pitch = AngleUnit.DEGREES.fromUnit(angleUnit, pitch);;
+        this.roll = AngleUnit.DEGREES.fromUnit(angleUnit, roll);;
     }
 
-    public double getX() {
-        return x;
+    public double getX(DistanceUnit unit) {
+        return unit.fromInches(x);
     }
 
-    public double getY() {
-        return y;
+    public double getY(DistanceUnit unit) {
+        return unit.fromInches(y);
     }
 
-    public double getZ() {
-        return z;
+    public double getZ(DistanceUnit unit) {
+        return unit.fromInches(z);
     }
 
-    public double getYaw() {
-        return yaw;
+    public double getYaw(AngleUnit unit) {
+        return unit.fromDegrees(yaw);
     }
 
-    public double getPitch() {
-        return pitch;
+    public double getPitch(AngleUnit unit) {
+        return unit.fromDegrees(pitch);
     }
 
-    public double getRoll() {
-        return roll;
+    public double getRoll(AngleUnit unit) {
+        return unit.fromDegrees(roll);
     }
 }
